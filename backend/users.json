@@ -1,0 +1,22 @@
+{
+  "admin": {
+    "password": "123",
+    "role": "admin"
+  },
+  "23se02cs009@ppsu.ac.in": {
+    "password": "123",
+    "role": "user"
+  },
+  "23se02cs008@ppsu.ac.in": {
+    "password": "1234",
+    "role": "user"
+  },
+  "admintestuser@ppsu.ac.in": {
+    "password": "123password123",
+    "role": "user"
+  },
+  "test@ppsu.ac.in": {
+    "password": "password123",
+    "role": "user"
+  }
+}

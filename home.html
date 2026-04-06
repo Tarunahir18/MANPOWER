@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MANPOWER Sports Department</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+
+body{
+    min-height:100vh;
+    background:
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)),
+        url("previous_background.png") no-repeat center/cover fixed;
+    color:#fff;
+    overflow-x:hidden;
+}
+
+.overlay{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,.6);
+z-index:-1;
+}
+
+/* LOADER */
+#loader{
+position:fixed;
+width:100%;
+height:100%;
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:1000;
+}
+.spinner{
+width:60px;
+height:60px;
+border:6px solid #333;
+border-top:6px solid #00ffae;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN */
+#loginPage{
+max-width:400px;
+margin:120px auto;
+background:rgba(0,0,0,.7);
+padding:30px;
+border-radius:12px;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin:8px 0;
+border-radius:6px;
+border:none;
+}
+
+input{
+background:#111;
+color:#fff;
+border:1px solid #00ffae;
+}
+
+button{
+background:#00ffae;
+font-weight:bold;
+cursor:pointer;
+}
+
+.message{text-align:center;color:#ff6666}
+
+.login-type{
+display:flex;
+gap:10px;
+margin-bottom:15px;
+}
+.login-type button{
+background:#111;
+color:#fff;
+border:1px solid #333;
+margin:8px 0;
+}
+.login-type button.active{
+background:#00ffae;
+color:#000;
+border:1px solid #00ffae;
+}
+
+.toggle-link{
+text-align:center;
+color:#00ffae;
+cursor:pointer;
+margin-top:10px;
+}
+
+/* HOME */
+#homePage{display:none}
+
+nav{
+display:flex;
+justify-content:space-between;
+padding:15px 25px;
+background:rgba(0,0,0,.6);
+position:fixed;
+width:100%;
+top:0;
+}
+
+.nav-links{display:flex;gap:20px}
+
+.nav-links a{
+color:#00ffae;
+text-decoration:none;
+}
+
+.home-container{
+max-width:900px;
+margin:120px auto;
+background:rgba(0,0,0,.6);
+padding:30px;
+border-radius:12px;
+}
+
+/* TOAST */
+.toast{
+position:fixed;
+bottom:30px;
+right:30px;
+background:#111;
+padding:14px;
+border-left:4px solid #00ffae;
+border-radius:8px;
+opacity:0;
+transition:.4s;
+}
+.toast.show{opacity:1}
+
+/* ADMIN DASHBOARD & TABLES */
+#adminDashboard, #studentDashboard{
+  display:none;
+  margin-top:40px;
+  overflow-x:auto;
+  padding: 10px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  background:rgba(255,255,255,0.05);
+}
+th, td{
+  padding:12px;
+  text-align:left;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+th{ color:#00ffae; font-size:0.9rem; text-transform:uppercase}
+.status-badge{
+  padding:4px 8px;
+  border-radius:4px;
+  font-size:0.8rem;
+  font-weight:bold;
+}
+.pending{ background: #ffcc00; color: #000; }
+.approved{ background: #00ffae; color: #000; }
+.rejected{ background: #ff4444; color: #fff; }
+
+.action-btn{
+  padding:5px 10px;
+  border:none;
+  border-radius:3px;
+  cursor:pointer;
+  margin-right:5px;
+  font-size:0.8rem;
+}
+.approve-btn{ background:#00ffae; color:#000 }
+.reject-btn{ background:#ff4444; color:#fff }
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div id="loader"><div class="spinner"></div></div>
+
+<!-- LOGIN -->
+<div id="loginPage">
+<h2 style="text-align:center;color:#00ffae" id="loginTitle">Student Login</h2>
+<div class="login-type">
+<button id="userTypeBtn" class="active">Student</button>
+<button id="adminTypeBtn">Admin</button>
+</div>
+<div class="message" id="message"></div>
+<input id="email" placeholder="PPSU Email">
+<input id="password" type="password" placeholder="Password">
+<button id="submitBtn">Login</button>
+<div class="toggle-link" id="toggleLink">New user? Sign up here</div>
+</div>
+
+<!-- HOME -->
+<div id="homePage">
+<nav>
+<div>MANPOWER Sports</div>
+<div class="nav-links">
+<a href="home.html">Home</a>
+<a href="notification.html">Notifications</a>
+<a href="games.html">Games</a>
+<a href="contact us.html">Contact Us</a>
+<a href="#" id="logoutBtn">Logout</a>
+</div>
+</nav>
+
+<div class="home-container">
+<h2 id="welcomeText"></h2>
+<p>Welcome to MANPOWER Sports Department</p>
+
+<!-- ADMIN ONLY SECTION -->
+<div id="adminDashboard">
+  <h3 style="color:#00ffae">👥 Registered Students (User Database)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Email (Student ID)</th>
+        <th>Password</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody id="userTableBody">
+      <!-- Data injected here -->
+    </tbody>
+  </table>
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Us – PPSU Sports Department</title>
+    <style>
+        /* Base reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: #fff;
+            background: 
+                linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.75)),
+                url("previous_background.png") no-repeat center/cover fixed;
+        }
+
+        /* Overlay to dim background */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        /* Navigation */
+        nav {
+            width: 100%;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: right;
+            gap: 20px;
+            z-index: 2;
+        }
+        nav a {
+            text-decoration: none;
+            font-size: 16px;
+            color: #00ffae;
+            font-weight: bold;
+            transition: .3s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 900px;
+            margin: 120px auto;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.7);
+            text-align: center;
+        }
+
+        h1 {
+            color: #00ffae;
+            margin-bottom: 15px;
+        }
+        p {
+            margin-bottom: 10px;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #fff;
+        }
+        .map {
+            margin-top: 20px;
+            width: 100%;
+            height: 350px;
+            border: 2px solid #00ffae;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    
+    <script>
+    // Check if user is logged in
+    const loggedInUser = localStorage.getItem('user');
+    if(!loggedInUser){
+        alert("You must be logged in to access this page.");
+        window.location.href = "home.html";
+    }
+    </script>
+
+
+    <div class="overlay"></div>
+
+    <!-- Navigation bar -->
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="notification.html">Notifications</a>
+        <a href="games.html">Games</a>
+        <a href="chess.html">Chess Enrollment</a>
+        <a href="contact us.html">Contact Us</a>
+    </nav>
+
+    <!-- Main content -->
+    <div class="container">
+        <h1>Contact Us</h1>
+
+        <p><b>University Name:</b> : P P SAVANI UNIVERSITY</p>
+        <p><b>Address:</b> NH-8, GETCO, Near Biltech, Village Dhamdod, Kosamba, Dist. Surat, Gujarat 394125, India </p>
+        <br>
+        <p><b>Phone:</b> +91 9879608000 (General) / +91 95120 35605 </p>
+        <p><b>Email:</b> sport@ppsu.ac.in / admission@ppsu.ac.in </p>
+
+        <hr style="border: 1px solid #00ffae; margin: 20px 0;">
+
+        <h1>Location Map</h1>
+        <iframe 
+            class="map"
+            src="https://www.google.com/maps?q=P%20P%20Savani%20University%20Kosamba%20Surat%20Gujarat&output=embed">
+        </iframe>
+    </div>
+
+</body>
+</html>
