@@ -191,7 +191,7 @@ app.post('/api/v1/users/enroll', async (req, res) => {
     }
 
     try {
-        // Check user exists
+        // 1. Ensure user exists before enrolling
         const { data: user } = await supabase
             .from('users')
             .select('email')
@@ -199,10 +199,19 @@ app.post('/api/v1/users/enroll', async (req, res) => {
             .single();
 
         if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            console.log(`[ENROLL] User ${email} not found. Auto-creating...`);
+            const randomPass = 'auto_' + Math.random().toString(36).substr(2, 16);
+            const { error: insErr } = await supabase
+                .from('users')
+                .insert([{ email, password: randomPass, role: 'user' }]);
+            
+            if (insErr) {
+                console.error('[ENROLL] Failed to auto-create user:', insErr);
+                return res.status(400).json({ success: false, message: insErr.message });
+            }
         }
 
-        // Insert enrollment (upsert to handle duplicates gracefully)
+        // 2. Insert enrollment (upsert to handle duplicates gracefully)
         const { error } = await supabase
             .from('enrollments')
             .upsert([{ user_email: email, game_name: gameName }], {
@@ -210,13 +219,13 @@ app.post('/api/v1/users/enroll', async (req, res) => {
             });
 
         if (error) {
-            console.error('[ENROLL] Error:', error.message);
+            console.error('[ENROLL] Supabase Error:', error.message);
             return res.status(400).json({ success: false, message: error.message });
         }
 
         return res.json({ success: true, message: `Enrolled in ${gameName}` });
     } catch (error) {
-        console.error('[ENROLL]', error);
+        console.error('[ENROLL] Exception:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
