@@ -61,10 +61,16 @@
     
     document.getElementById('sportTitle').innerText = gameName.toUpperCase();
     document.title = gameName + " – MANPOWER";
-    
-    // Use the local stadium image for all sports
+
     const imgEl = document.getElementById('sportImage');
-    imgEl.src = "stadium.png";
+    const normalizedGame = gameName.trim().toLowerCase();
+    if (normalizedGame === 'chess') {
+        imgEl.src = '../assets/images/chess.jpg';
+        imgEl.alt = 'Chess Player';
+    } else {
+        imgEl.src = '../assets/images/stadium.png';
+        imgEl.alt = gameName + ' Image';
+    }
 
     const localToast = (msg, error=false) => {
         const t = document.getElementById('toast');
