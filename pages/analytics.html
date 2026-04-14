@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics – MANPOWER Sports</title>
+    <meta name="description" content="Sports analytics and statistics at MANPOWER.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    const loggedInUser = localStorage.getItem('user');
+    if(!loggedInUser){
+        alert("You must be logged in to access this page.");
+        window.location.href = "../index.html";
+    }
+    let user;
+    try { user = JSON.parse(loggedInUser); } catch (e) { user = { email: loggedInUser, role: 'user' }; }
+    if(user.role !== 'admin') { alert("Only admins can view analytics."); window.location.href = "../index.html"; }
+</script>
+
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="admin-dashboard.html">📈 Dashboard</a>
+        <a href="admin-users.html">👥 Users</a>
+        <a href="admin-reports.html">📑 Reports</a>
+        <a href="analytics.html" class="active">📊 Analytics</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container-wide">
+
+    <div class="page-header">
+        <h1>📊 Sports Analytics & Statistics</h1>
+        <p>Real-time data insights from the platform</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card" style="text-align:center;">
+            <div class="stat-icon" style="margin:0 auto 10px;">👥</div>
+            <div class="stat-number" id="totalUsers">0</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card" style="text-align:center;">
+            <div class="stat-icon" style="margin:0 auto 10px;">🎮</div>
+            <div class="stat-number" id="totalEnrollments">0</div>
+            <div class="stat-label">Total Enrollments</div>
+        </div>
+        <div class="stat-card" style="text-align:center;">
+            <div class="stat-icon" style="margin:0 auto 10px;">📨</div>
+            <div class="stat-number" id="totalMessages">0</div>
+            <div class="stat-label">Contact Messages</div>
+        </div>
+        <div class="stat-card" style="text-align:center;">
+            <div class="stat-icon" style="margin:0 auto 10px;">📈</div>
+            <div class="stat-number" id="avgEnrollments">0</div>
+            <div class="stat-label">Avg Enrollments/User</div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:20px;">
+        <div class="chart-container">
+            <h3>🏆 Most Enrolled Games</h3>
+            <div id="topGames"></div>
+        </div>
+        <div class="chart-container">
+            <h3>👥 User Activity</h3>
+            <div id="userActivity"></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js" defer></script>
+<script>
+    async function loadAnalytics() {
+        try {
+            const data = await apiRequest('/users');
+            if (data.success && data.users) {
+                const users = data.users;
+                const totalUsers = Object.keys(users).length;
+                let totalEnrollments = 0;
+                let gameCount = {};
+
+                Object.values(users).forEach(user => {
+                    const enrolled = user.enrolled || [];
+                    totalEnrollments += enrolled.length;
+                    enrolled.forEach(game => { gameCount[game] = (gameCount[game] || 0) + 1; });
+                });
+
+                document.getElementById('totalUsers').innerText = totalUsers;
+                document.getElementById('totalEnrollments').innerText = totalEnrollments;
+                document.getElementById('avgEnrollments').innerText = (totalEnrollments / (totalUsers || 1)).toFixed(1);
+
+                try {
+                    const contactData = await apiRequest('/contacts');
+                    document.getElementById('totalMessages').innerText = contactData.contacts.length;
+                } catch (e) {
+                    document.getElementById('totalMessages').innerText = '0';
+                }
+
+                const sortedGames = Object.entries(gameCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                const topGamesHtml = sortedGames.map(([game, count]) => {
+                    const maxCount = Math.max(...sortedGames.map(g => g[1]), 1);
+                    const width = (count / maxCount) * 100;
+                    return `<div class="chart-bar"><div class="chart-label">${game}</div><div class="chart-fill" style="width: ${width}%"></div><div class="chart-value">${count} users</div></div>`;
+                }).join('');
+
+                document.getElementById('topGames').innerHTML = topGamesHtml || '<p style="color:var(--text-muted);">No enrollment data yet.</p>';
+
+                let activeUsers = 0;
+                Object.values(users).forEach(user => { if ((user.enrolled || []).length > 0) activeUsers++; });
+
+                document.getElementById('userActivity').innerHTML = `
+                    <div class="chart-bar"><div class="chart-label">Active</div><div class="chart-fill" style="width: ${(activeUsers / (totalUsers || 1)) * 100}%"></div><div class="chart-value">${activeUsers} users</div></div>
+                    <div class="chart-bar"><div class="chart-label">Inactive</div><div class="chart-fill" style="width: ${((totalUsers - activeUsers) / (totalUsers || 1)) * 100}%; background: linear-gradient(90deg, var(--accent), #a788ff);"></div><div class="chart-value">${totalUsers - activeUsers} users</div></div>
+                `;
+            }
+        } catch (err) {
+            console.error('Error loading analytics:', err);
+        }
+    }
+
+    window.addEventListener('load', loadAnalytics);
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+    }
+</script>
+</body>
+</html>

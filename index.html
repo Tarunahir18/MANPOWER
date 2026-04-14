@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANPOWER – Sports Management System</title>
+    <meta name="description" content="MANPOWER Sports Management System – Your one-stop platform for sports enrollment, tournaments, schedules, and performance tracking at P P Savani University.">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+    <div class="loader-text">MANPOWER</div>
+</div>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+    <div class="login-logo">
+        <img src="assets/images/manpower-logo.png" alt="MANPOWER Logo" id="loginLogoImg">
+        <h2 id="loginTitle">Student Login</h2>
+    </div>
+    <p id="modeNote">Use your PPSU email to login or sign up.</p>
+
+    <div class="login-type">
+        <button id="userTypeBtn" class="active">Student</button>
+        <button id="adminTypeBtn">Admin</button>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <input id="email" placeholder="PPSU Email" autocomplete="email">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="submitBtn" class="btn-primary" style="width:100%; margin-top:12px;">Login</button>
+
+    <div id="googleDivider" style="display:flex; align-items:center; gap:12px; margin:18px 0 14px;">
+        <div style="flex:1; height:1px; background:var(--border-default);"></div>
+        <span style="color:var(--text-muted); font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:1px;">or</span>
+        <div style="flex:1; height:1px; background:var(--border-default);"></div>
+    </div>
+
+    <button id="googleSignInBtn" onclick="handleGoogleSignIn()" style="width:100%; padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-default); background:var(--bg-input); color:var(--text-primary); font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:var(--transition-normal);">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.998 23.998 0 0 0 0 24c0 3.77.9 7.34 2.44 10.51l8.09-5.92z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Sign in with Google
+    </button>
+
+    <div class="toggle-link" id="toggleLink">New user? Sign up here</div>
+    <div style="text-align:center; margin-top:10px;">
+        <a href="pages/forgot-password.html" style="font-size:13px;">Forgot Password?</a>
+    </div>
+</div>
+
+<!-- HOME PAGE -->
+<div id="homePage">
+
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="nav-brand">
+            <img src="assets/images/manpower-logo.png" alt="MANPOWER">
+            <div>
+                <span class="nav-brand-text">MANPOWER</span>
+                <span class="nav-brand-sub">Sports Management</span>
+            </div>
+        </a>
+
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div class="theme-controller" onclick="toggleTheme()">
+                <div class="indicator"></div>
+                <div class="segment dark active">🌙</div>
+                <div class="segment light">☀</div>
+            </div>
+            <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+        </div>
+
+        <div class="nav-links" id="navLinks">
+            <a href="index.html" class="active">🏠 Home</a>
+            <a href="pages/about.html">ℹ️ About</a>
+            <a href="pages/store.html">🛒 Store</a>
+            <a href="pages/profile.html" class="user-only">👤 Profile</a>
+            <a href="pages/games.html" class="user-only">🎮 Games</a>
+            <a href="pages/leaderboard.html" class="user-only">🏆 Leaderboard</a>
+            <a href="pages/notification.html" class="user-only">🔔 Alerts</a>
+            <a href="pages/schedules.html" class="user-only">📅 Schedules</a>
+            <a href="pages/results.html" class="user-only">📊 Results</a>
+            <a href="pages/news.html" class="user-only">📰 News</a>
+            <a href="pages/admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+            <a href="pages/admin-users.html" class="admin-only">👥 Users</a>
+            <a href="pages/admin-reports.html" class="admin-only">📑 Reports</a>
+            <a href="pages/analytics.html" class="admin-only">📊 Analytics</a>
+            <a href="pages/contact.html">✉️ Contact</a>
+            <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="page-container">
+
+        <!-- Hero Banner -->
+        <div class="hero-section">
+            <img src="assets/images/stadium.png" alt="Sports Stadium">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-badge">🏋️ P P Savani University</div>
+                <h2 id="welcomeText">Welcome to MANPOWER</h2>
+                <p>Your One-Stop Sports Management Platform – Train, Compete, Conquer.</p>
+            </div>
+        </div>
+
+        <!-- STUDENT DASHBOARD -->
+        <div id="studentDashboard">
+            <div class="quick-links">
+                <div class="quick-link-card" onclick="window.location.assign('pages/games.html')">
+                    <span class="quick-link-icon">🎮</span>
+                    <div class="quick-link-title">Enroll in Games</div>
+                    <div class="quick-link-desc">Browse & join sports teams</div>
+                </div>
+                <div class="quick-link-card" onclick="window.location.assign('pages/leaderboard.html')">
+                    <span class="quick-link-icon">🏆</span>
+                    <div class="quick-link-title">Leaderboard</div>
+                    <div class="quick-link-desc">Check rankings & scores</div>
+                </div>
+                <div class="quick-link-card" onclick="window.location.assign('pages/profile.html')">
+                    <span class="quick-link-icon">📊</span>
+                    <div class="quick-link-title">My Stats</div>
+                    <div class="quick-link-desc">View your performance</div>
+                </div>
+                <div class="quick-link-card" onclick="window.location.assign('pages/schedules.html')">
+                    <span class="quick-link-icon">📅</span>
+                    <div class="quick-link-title">Schedules</div>
+                    <div class="quick-link-desc">Upcoming events & practice</div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-top: 20px;">
+                <h3 style="margin-bottom:8px;">🏆 Upcoming Tournaments & Venues</h3>
+                <p style="margin-bottom:20px; font-size:14px;">Discover officially launched tournaments by MANPOWER admins. Be quick – spots fill fast!</p>
+                <div id="tournamentsList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    <!-- Dynamic Tournaments Go Here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="adminDashboard">
+            <h3 style="margin-bottom:20px;">📊 Admin Dashboard</h3>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number" id="totalUsersCard">--</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎮</div>
+                    <div class="stat-number" id="totalEnrollmentsCard">--</div>
+                    <div class="stat-label">Total Enrollments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📨</div>
+                    <div class="stat-number" id="pendingMessagesCard">--</div>
+                    <div class="stat-label">Contact Messages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👤</div>
+                    <div class="stat-number" id="activeUsersCard">--</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+            </div>
+
+            <!-- Tournament Management -->
+            <div class="glass-card" style="margin-bottom: 32px;">
+                <h3 style="margin-bottom:6px;">🏟️ Manage Tournaments</h3>
+                <p style="margin-bottom:16px; font-size:13px;">Add new tournament – a venue photo will be auto-generated and email notification simulated for all registered users.</p>
+
+                <form id="createTournamentForm" onsubmit="handleCreateTournament(event)" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+                    <div style="flex:1; min-width: 180px;">
+                        <label>Tournament Name</label>
+                        <input type="text" id="tName" placeholder="e.g. Summer Cup" required>
+                    </div>
+                    <div style="flex:1; min-width: 180px;">
+                        <label>Venue</label>
+                        <input type="text" id="tVenue" placeholder="e.g. Main Stadium" required>
+                    </div>
+                    <div style="flex:1; min-width: 140px;">
+                        <label>Sport</label>
+                        <select id="tSport">
+                            <option value="General">General / Other</option>
+                            <option value="Football">Football</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Cricket">Cricket</option>
+                            <option value="Chess">Chess</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary" style="height:44px; margin-top:auto;">Launch 🚀</button>
+                </form>
+            </div>
+
+            <!-- Registered Students Table -->
+            <div class="glass-card">
+                <h3 style="margin-bottom:16px;">👥 Registered Students (User Database)</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email (Student ID)</th>
+                                <th>Password</th>
+                                <th>Role</th>
+                                <th>Enrolled Games</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Data injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/script.js" defer></script>
+
+<script>
+    // ---- Supabase Client (Frontend) ----
+    const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ---- Google Sign-In Handler ----
+    async function handleGoogleSignIn() {
+        const btn = document.getElementById('googleSignInBtn');
+        btn.innerText = 'Connecting...';
+        btn.disabled = true;
+
+        const { data, error } = await _supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + '/index.html',
+                queryParams: {
+                    hd: 'ppsu.ac.in' // Hint Google to show only @ppsu.ac.in accounts
+                }
+            }
+        });
+
+        if (error) {
+            const msgEl = document.getElementById('message');
+            if (msgEl) msgEl.innerText = 'Google Sign-In failed: ' + error.message;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.998 23.998 0 0 0 0 24c0 3.77.9 7.34 2.44 10.51l8.09-5.92z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Sign in with Google';
+            btn.disabled = false;
+        }
+        // If successful, the browser redirects to Google. No need to handle here.
+    }
+
+    // ---- Handle OAuth Callback (after redirect back from Google) ----
+    async function handleAuthCallback() {
+        // Check URL for auth callback tokens
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasAuthTokens = hashParams.has('access_token') || window.location.search.includes('code=');
+        
+        if (hasAuthTokens) {
+            console.log('[GOOGLE AUTH] Detected OAuth callback...');
+            const { data: { session }, error } = await _supabase.auth.getSession();
+
+            if (error) {
+                console.error('[GOOGLE AUTH] Session error:', error);
+                return;
+            }
+
+            if (session && session.user) {
+                const googleEmail = session.user.email;
+                console.log('[GOOGLE AUTH] Signed in as:', googleEmail);
+
+                // Enforce @ppsu.ac.in domain
+                if (!googleEmail.endsWith('@ppsu.ac.in')) {
+                    await _supabase.auth.signOut();
+                    const msgEl = document.getElementById('message');
+                    if (msgEl) {
+                        msgEl.innerText = 'Only @ppsu.ac.in emails are allowed. Please use your university email.';
+                    }
+                    // Clean URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    return;
+                }
+
+                // Sync Google user to our backend database
+                try {
+                    const apiBase = await detectApiUrl();
+                    const res = await fetch(`${apiBase}/auth/google-sync`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: googleEmail,
+                            name: session.user.user_metadata?.full_name || '',
+                            avatar: session.user.user_metadata?.avatar_url || ''
+                        })
+                    });
+                    const data = await res.json();
+                    console.log('[GOOGLE AUTH] Sync result:', data);
+                } catch (e) {
+                    console.warn('[GOOGLE AUTH] Sync failed (non-critical):', e.message);
+                }
+
+                // Store user in localStorage and show home
+                localStorage.setItem('user', JSON.stringify({
+                    email: googleEmail,
+                    role: 'user',
+                    enrolled: [],
+                    activities: [],
+                    googleAuth: true,
+                    name: session.user.user_metadata?.full_name || '',
+                    avatar: session.user.user_metadata?.avatar_url || ''
+                }));
+
+                // Clean URL and show home
+                window.history.replaceState({}, document.title, window.location.pathname);
+                showHome();
+                return;
+            }
+        }
+
+        // Also check for existing Supabase session (user returns to page)
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session && session.user && !localStorage.getItem('user')) {
+            const googleEmail = session.user.email;
+            if (googleEmail.endsWith('@ppsu.ac.in')) {
+                localStorage.setItem('user', JSON.stringify({
+                    email: googleEmail,
+                    role: 'user',
+                    enrolled: [],
+                    activities: [],
+                    googleAuth: true,
+                    name: session.user.user_metadata?.full_name || '',
+                    avatar: session.user.user_metadata?.avatar_url || ''
+                }));
+                showHome();
+            }
+        }
+    }
+
+    // Run callback handler on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        handleAuthCallback();
+    });
+</script>
+
+</body>
+</html>

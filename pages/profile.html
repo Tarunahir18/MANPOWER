@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile – MANPOWER Sports</title>
+    <meta name="description" content="View your sports profile, enrolled games, badges and activity history at MANPOWER.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    const loggedInUser = localStorage.getItem('user');
+    if(!loggedInUser){
+        alert("You must be logged in to access this page.");
+        window.location.href = "../index.html";
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div class="theme-controller" onclick="toggleTheme()">
+            <div class="indicator"></div>
+            <div class="segment dark active">🌙</div>
+            <div class="segment light">☀</div>
+        </div>
+        <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="store.html">🛒 Store</a>
+        <a href="profile.html" class="active">👤 Profile</a>
+        <a href="games.html" class="user-only">🎮 Games</a>
+        <a href="leaderboard.html" class="user-only">🏆 Leaderboard</a>
+        <a href="schedules.html" class="user-only">📅 Schedules</a>
+        <a href="results.html" class="user-only">📊 Results</a>
+        <a href="news.html" class="user-only">📰 News</a>
+        <a href="admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+        <a href="admin-users.html" class="admin-only">👥 Users</a>
+        <a href="admin-reports.html" class="admin-only">📑 Reports</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container" style="max-width:900px;">
+
+    <div class="page-header">
+        <h1>👤 My Profile</h1>
+    </div>
+
+    <div class="glass-card" id="profileInfo">
+        <p style="text-align:center; color:var(--text-muted);">Loading profile...</p>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js"></script>
+<script>
+    async function loadProfile() {
+        const userStr = localStorage.getItem('user');
+        if (!userStr) return;
+
+        let user;
+        try { user = JSON.parse(userStr); } catch (e) { user = { email: userStr, role: 'user' }; }
+
+        const profileInfo = document.getElementById('profileInfo');
+        const initial = user.email ? user.email.charAt(0).toUpperCase() : '?';
+
+        profileInfo.innerHTML = `
+            <div class="profile-header">
+                <div class="profile-avatar">${initial}</div>
+                <div>
+                    <h2 style="margin-bottom:4px;">${user.email.split('@')[0]}</h2>
+                    <p style="margin:0;"><span class="badge ${user.role === 'admin' ? 'badge-accent' : user.role === 'coach' ? 'badge-warning' : 'badge-info'}">${user.role}</span></p>
+                    <p style="margin-top:4px; font-size:13px; color:var(--text-muted);">${user.email}</p>
+                </div>
+            </div>
+            <hr class="section-divider">
+            <div style="margin-top:20px;">
+                <h3 style="margin-bottom:12px;">🎮 Enrolled Games</h3>
+                <ul id="enrolledList" class="game-list" style="margin-bottom:0;">
+                    <li style="justify-content:center; cursor:default;">Loading...</li>
+                </ul>
+            </div>
+            <hr class="section-divider">
+            <div>
+                <h3 style="margin-bottom:12px;">🏅 Achievement Badges</h3>
+                <div id="badgeBox" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+            <hr class="section-divider">
+            <div>
+                <h3 style="margin-bottom:12px;">📜 Activity History</h3>
+                <ul id="activityList" class="game-list" style="margin-bottom:0;">
+                    <li style="justify-content:center; cursor:default;">Loading...</li>
+                </ul>
+            </div>
+        `;
+
+        // Fetch enrolled games from server
+        try {
+            const data = await apiRequest('/users/' + encodeURIComponent(user.email));
+            if (data.success && data.user) {
+                const enrolled = data.user.enrolled || [];
+                const enrolledList = document.getElementById('enrolledList');
+                if (enrolled.length > 0) {
+                    enrolledList.innerHTML = enrolled.map(game => `<li style="cursor:default;"><span style="font-weight:600;">${game}</span><span class="badge badge-success">Enrolled</span></li>`).join('');
+                } else {
+                    enrolledList.innerHTML = '<li style="justify-content:center; cursor:default; color:var(--text-muted);">No enrolled games yet. <a href="games.html" style="margin-left:8px;">Browse games →</a></li>';
+                }
+                const activities = data.user.activities || [];
+                const activityList = document.getElementById('activityList');
+                if (activities.length > 0) {
+                    activityList.innerHTML = activities.slice(-10).reverse().map(act => `<li style="cursor:default; font-size:14px;"><span>${act.action} in <strong>${act.game}</strong></span><span class="badge badge-info">${new Date(act.timestamp).toLocaleDateString()}</span></li>`).join('');
+                } else {
+                    activityList.innerHTML = '<li style="justify-content:center; cursor:default; color:var(--text-muted);">No activities yet.</li>';
+                }
+            } else {
+                fallbackProfile(user);
+            }
+        } catch (err) {
+            fallbackProfile(user);
+        }
+
+        // Apply badges
+        if (typeof applyProfileBadges === 'function') applyProfileBadges();
+    }
+
+    function fallbackProfile(user) {
+        const enrolled = user.enrolled || [];
+        const enrolledList = document.getElementById('enrolledList');
+        if (enrolled.length > 0) {
+            enrolledList.innerHTML = enrolled.map(game => `<li style="cursor:default;"><span style="font-weight:600;">${game}</span><span class="badge badge-success">Enrolled</span></li>`).join('');
+        } else {
+            enrolledList.innerHTML = '<li style="justify-content:center; cursor:default; color:var(--text-muted);">No enrolled games yet.</li>';
+        }
+        const activities = user.activities || [];
+        const activityList = document.getElementById('activityList');
+        if (activities.length > 0) {
+            activityList.innerHTML = activities.slice(-10).reverse().map(act => `<li style="cursor:default; font-size:14px;">${act.action} in ${act.game} on ${new Date(act.timestamp).toLocaleDateString()}</li>`).join('');
+        } else {
+            activityList.innerHTML = '<li style="justify-content:center; cursor:default; color:var(--text-muted);">No activities yet.</li>';
+        }
+    }
+
+    loadProfile();
+
+    // Role-based menu
+    const user = localStorage.getItem('user');
+    if (user) {
+        const userData = JSON.parse(user);
+        document.querySelectorAll('.admin-only').forEach(link => link.classList.toggle('show', userData.role === 'admin'));
+        document.querySelectorAll('.user-only').forEach(link => link.classList.toggle('show', userData.role !== 'admin'));
+    }
+
+    // Logout & Menu
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+    }
+</script>
+</body>
+</html>

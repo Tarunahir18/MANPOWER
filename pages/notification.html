@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications – MANPOWER Sports</title>
+    <meta name="description" content="Sports notifications and event alerts at MANPOWER.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    if(!localStorage.getItem('user')){
+        alert("You must be logged in to access this page.");
+        window.location.href = "../index.html";
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="profile.html" class="user-only">👤 Profile</a>
+        <a href="games.html" class="user-only">🎮 Games</a>
+        <a href="leaderboard.html" class="user-only">🏆 Leaderboard</a>
+        <a href="notification.html" class="active">🔔 Alerts</a>
+        <a href="schedules.html" class="user-only">📅 Schedules</a>
+        <a href="results.html" class="user-only">📊 Results</a>
+        <a href="news.html" class="user-only">📰 News</a>
+        <a href="admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+        <a href="admin-users.html" class="admin-only">👥 Users</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container" style="max-width:800px;">
+
+    <div class="page-header" style="text-align:center;">
+        <h1>🔔 Notifications & Alerts</h1>
+        <p>Stay updated with sports events and announcements</p>
+    </div>
+
+    <!-- Event Cards -->
+    <div class="cards-grid" style="grid-template-columns: 1fr; margin-bottom:32px;">
+        <div class="card animate-fade" style="animation-delay:0.1s;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-size:18px;">⚽ Football Tournament</h3>
+                <span class="badge badge-success">Open</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="font-size:13px; color:var(--text-secondary);">Team Size: <strong style="color:var(--text-primary);">11</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Location: <strong style="color:var(--text-primary);">Main Ground</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Fee: <strong style="color:var(--primary);">₹250</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Status: <strong style="color:var(--primary);">Registering</strong></div>
+            </div>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay:0.2s;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-size:18px;">🏏 Cricket League</h3>
+                <span class="badge badge-info">Upcoming</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="font-size:13px; color:var(--text-secondary);">Team Size: <strong style="color:var(--text-primary);">11</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Location: <strong style="color:var(--text-primary);">Cricket Field</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Fee: <strong style="color:var(--primary);">₹200</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Status: <strong style="color:var(--info);">Coming Soon</strong></div>
+            </div>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay:0.3s;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-size:18px;">🏀 Basketball Cup</h3>
+                <span class="badge badge-warning">Limited Spots</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="font-size:13px; color:var(--text-secondary);">Team Size: <strong style="color:var(--text-primary);">5</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Location: <strong style="color:var(--text-primary);">Sports Hall</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Fee: <strong style="color:var(--primary);">₹150</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Status: <strong style="color:var(--warning);">Filling Fast</strong></div>
+            </div>
+        </div>
+
+        <div class="card animate-fade" style="animation-delay:0.4s;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-size:18px;">🎾 Tennis Singles</h3>
+                <span class="badge badge-success">Open</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="font-size:13px; color:var(--text-secondary);">Singles: <strong style="color:var(--text-primary);">1v1</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Location: <strong style="color:var(--text-primary);">Tennis Court</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Fee: <strong style="color:var(--primary);">₹100</strong></div>
+                <div style="font-size:13px; color:var(--text-secondary);">Status: <strong style="color:var(--primary);">Open</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements -->
+    <div class="glass-card">
+        <h3 style="margin-bottom:16px;">📢 Announcements</h3>
+        <ul id="notificationList" style="list-style:none;">
+            <li class="event-card" style="margin-bottom:8px;"><strong style="color:var(--danger);">⚠️</strong> Badminton practice canceled on April 10 due to maintenance.</li>
+            <li class="event-card" style="margin-bottom:8px;"><strong style="color:var(--primary);">🛒</strong> New sports equipment available in the store.</li>
+            <li class="event-card" style="margin-bottom:0;"><strong style="color:var(--warning);">⏰</strong> Football tournament registration closes on April 15.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+        }
+        const user = localStorage.getItem('user');
+        if (user) {
+            try {
+                const userData = JSON.parse(user);
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('show', userData.role === 'admin'));
+                document.querySelectorAll('.user-only').forEach(el => el.classList.toggle('show', userData.role !== 'admin'));
+            } catch(e) {}
+        }
+        document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    });
+</script>
+</body>
+</html>

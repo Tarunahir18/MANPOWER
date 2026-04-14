@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results – MANPOWER Sports</title>
+    <meta name="description" content="View sports results, leaderboards, and standings at MANPOWER.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    const loggedInUser = localStorage.getItem('user');
+    if(!loggedInUser){
+        alert("You must be logged in to access this page.");
+        window.location.href = "../index.html";
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="profile.html" class="user-only">👤 Profile</a>
+        <a href="games.html" class="user-only">🎮 Games</a>
+        <a href="leaderboard.html" class="user-only">🏆 Leaderboard</a>
+        <a href="schedules.html" class="user-only">📅 Schedules</a>
+        <a href="results.html" class="active">📊 Results</a>
+        <a href="news.html" class="user-only">📰 News</a>
+        <a href="admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+        <a href="admin-users.html" class="admin-only">👥 Users</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container" style="max-width:1000px;">
+
+    <div class="page-header">
+        <h1>📊 Results & Standings</h1>
+        <p>Latest tournament results and league standings</p>
+    </div>
+
+    <!-- Chess Results -->
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h3 style="margin-bottom:16px;">♟️ Chess Tournament Results</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr><th>Rank</th><th>Player</th><th>Points</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span style="font-size:16px;">🥇</span> 1</td>
+                        <td><strong>Gukesh D</strong></td>
+                        <td><span style="color:var(--primary); font-weight:700;">2850</span></td>
+                    </tr>
+                    <tr>
+                        <td><span style="font-size:16px;">🥈</span> 2</td>
+                        <td><strong>Viswanathan Anand</strong></td>
+                        <td><span style="color:var(--primary); font-weight:700;">2750</span></td>
+                    </tr>
+                    <tr>
+                        <td><span style="font-size:16px;">🥉</span> 3</td>
+                        <td><strong>Divya Deshmukh</strong></td>
+                        <td><span style="color:var(--primary); font-weight:700;">2650</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Badminton -->
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h3 style="margin-bottom:16px;">🏸 Badminton Winners</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr><th>Position</th><th>Winner</th><th>Score</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span style="font-size:16px;">🥇</span> 1st</td>
+                        <td><strong>Player A</strong></td>
+                        <td><span class="badge badge-success">21-15</span></td>
+                    </tr>
+                    <tr>
+                        <td><span style="font-size:16px;">🥈</span> 2nd</td>
+                        <td><strong>Player B</strong></td>
+                        <td><span class="badge badge-warning">18-21</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Football -->
+    <div class="glass-card">
+        <h3 style="margin-bottom:16px;">⚽ Football League Standings</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr><th>Team</th><th>Wins</th><th>Draws</th><th>Losses</th><th>Points</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Team Alpha</strong></td>
+                        <td>5</td>
+                        <td>2</td>
+                        <td>1</td>
+                        <td><span style="color:var(--primary); font-weight:700;">17</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Team Beta</strong></td>
+                        <td>4</td>
+                        <td>3</td>
+                        <td>1</td>
+                        <td><span style="color:var(--primary); font-weight:700;">15</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+        }
+        const user = localStorage.getItem('user');
+        if (user) {
+            try {
+                const userData = JSON.parse(user);
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('show', userData.role === 'admin'));
+                document.querySelectorAll('.user-only').forEach(el => el.classList.toggle('show', userData.role !== 'admin'));
+            } catch(e) {}
+        }
+        document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    });
+</script>
+</body>
+</html>

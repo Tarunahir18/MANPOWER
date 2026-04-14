@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedules & Events – MANPOWER Sports</title>
+    <meta name="description" content="View upcoming sports schedules, events and book slots at MANPOWER.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    const loggedInUser = localStorage.getItem('user');
+    if(!loggedInUser){
+        alert("You must be logged in to access this page.");
+        window.location.href = "../index.html";
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="profile.html" class="user-only">👤 Profile</a>
+        <a href="games.html" class="user-only">🎮 Games</a>
+        <a href="leaderboard.html" class="user-only">🏆 Leaderboard</a>
+        <a href="schedules.html" class="active">📅 Schedules</a>
+        <a href="results.html" class="user-only">📊 Results</a>
+        <a href="news.html" class="user-only">📰 News</a>
+        <a href="admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+        <a href="admin-users.html" class="admin-only">👥 Users</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container" style="max-width:900px;">
+
+    <div class="page-header">
+        <h1>📅 Upcoming Schedules & Events</h1>
+        <p>Stay updated with practice sessions, matches, and campus sports events</p>
+    </div>
+
+    <!-- Event Cards -->
+    <div class="event-card animate-fade" style="animation-delay:0.1s;">
+        <h3>⚽ Football Practice</h3>
+        <p><strong style="color:var(--text-primary);">Date:</strong> April 10, 2026</p>
+        <p><strong style="color:var(--text-primary);">Time:</strong> 5:00 PM – 7:00 PM</p>
+        <p><strong style="color:var(--text-primary);">Location:</strong> Main Ground</p>
+        <button onclick="bookSchedule('Football Practice')" class="btn-primary btn-sm" style="margin-top:12px;">Book Slot →</button>
+    </div>
+
+    <div class="event-card animate-fade" style="animation-delay:0.2s;">
+        <h3>🏸 Badminton Tournament</h3>
+        <p><strong style="color:var(--text-primary);">Date:</strong> April 15, 2026</p>
+        <p><strong style="color:var(--text-primary);">Time:</strong> 9:00 AM – 5:00 PM</p>
+        <p><strong style="color:var(--text-primary);">Location:</strong> Sports Hall</p>
+        <button onclick="bookSchedule('Badminton Tournament')" class="btn-primary btn-sm" style="margin-top:12px;">Book Slot →</button>
+    </div>
+
+    <div class="event-card animate-fade" style="animation-delay:0.3s;">
+        <h3>♟️ Chess Club Meeting</h3>
+        <p><strong style="color:var(--text-primary);">Date:</strong> April 20, 2026</p>
+        <p><strong style="color:var(--text-primary);">Time:</strong> 4:00 PM – 6:00 PM</p>
+        <p><strong style="color:var(--text-primary);">Location:</strong> Library Room 101</p>
+        <button onclick="bookSchedule('Chess Club Meeting')" class="btn-primary btn-sm" style="margin-top:12px;">Book Slot →</button>
+    </div>
+
+    <div class="event-card animate-fade" style="animation-delay:0.4s;">
+        <h3>🏐 Volleyball League</h3>
+        <p><strong style="color:var(--text-primary);">Date:</strong> April 25, 2026</p>
+        <p><strong style="color:var(--text-primary);">Time:</strong> 10:00 AM – 12:00 PM</p>
+        <p><strong style="color:var(--text-primary);">Location:</strong> Outdoor Court</p>
+        <button onclick="bookSchedule('Volleyball League')" class="btn-primary btn-sm" style="margin-top:12px;">Book Slot →</button>
+    </div>
+
+    <!-- Booking History -->
+    <div class="glass-card" style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">📋 Booking History</h3>
+        <ul id="bookingHistory" class="game-list" style="margin:0;">
+            <li style="cursor:default; justify-content:center; color:var(--text-muted);">Loading bookings…</li>
+        </ul>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+        }
+        const user = localStorage.getItem('user');
+        if (user) {
+            try {
+                const userData = JSON.parse(user);
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('show', userData.role === 'admin'));
+                document.querySelectorAll('.user-only').forEach(el => el.classList.toggle('show', userData.role !== 'admin'));
+            } catch(e) {}
+        }
+        document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    });
+</script>
+</body>
+</html>

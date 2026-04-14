@@ -1,0 +1,16 @@
+{
+  "name": "PPSU Sports Department",
+  "short_name": "PPSU Sports",
+  "description": "Sports management and enrollment for PPSU students",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00ffae",
+  "icons": [
+    {
+      "src": "assets/images/manpower-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

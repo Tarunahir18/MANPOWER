@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management – MANPOWER Sports</title>
+    <meta name="description" content="Manage users, roles and enrollments at MANPOWER Sports.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="admin-dashboard.html">📈 Dashboard</a>
+        <a href="admin-users.html" class="active">👥 Users</a>
+        <a href="admin-reports.html">📑 Reports</a>
+        <a href="analytics.html">📊 Analytics</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container-wide">
+
+    <div class="page-header">
+        <h1>👥 User Management</h1>
+        <p>Search, filter and manage all registered users</p>
+    </div>
+
+    <!-- Controls -->
+    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+        <div class="search-wrapper" style="flex:1; min-width:200px; margin-bottom:0;">
+            <input type="text" id="searchBox" placeholder="Search users by email..." oninput="filterUsers(this.value)">
+        </div>
+        <button class="btn-primary" onclick="loadUsers()" style="height:44px;">🔄 Refresh</button>
+        <button class="btn-secondary" onclick="exportUsersCsv()" style="height:44px;">📥 Export CSV</button>
+    </div>
+
+    <!-- Table -->
+    <div class="glass-card" style="padding:0; overflow:hidden;">
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Enrollments</th>
+                        <th>Activities</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color:var(--text-muted);">Loading users...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js"></script>
+<script>
+    const user = localStorage.getItem('user');
+    if (!user) { window.location.href = '../index.html'; }
+    else {
+        const userData = JSON.parse(user);
+        if (userData.role !== 'admin') { alert('Admin access only!'); window.location.href = '../index.html'; }
+    }
+
+    const searchBox = document.getElementById('searchBox');
+    searchBox.addEventListener('input', (e) => filterUsers(e.target.value));
+
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+    }
+    loadUsers();
+</script>
+</body>
+</html>

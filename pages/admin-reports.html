@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports – MANPOWER Sports</title>
+    <meta name="description" content="Generate reports and view analytics at MANPOWER Sports.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="admin-dashboard.html">📈 Dashboard</a>
+        <a href="admin-users.html">👥 Users</a>
+        <a href="admin-reports.html" class="active">📑 Reports</a>
+        <a href="analytics.html">📊 Analytics</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container-wide">
+
+    <div class="page-header">
+        <h1>📑 Reports & Analytics</h1>
+        <p>Generate detailed reports and view platform analytics</p>
+    </div>
+
+    <!-- Report Cards -->
+    <div class="cards-grid" style="margin-bottom:32px;">
+        <div class="card" onclick="generateReport('enrollment')">
+            <div class="card-icon">📊</div>
+            <h3>Enrollment Report</h3>
+            <p>Generate reports on game enrollments, user participation, and trends</p>
+            <button class="btn-primary btn-sm" style="margin-top:12px; width:100%;">Generate →</button>
+        </div>
+        <div class="card" onclick="generateReport('demographics')">
+            <div class="card-icon">👥</div>
+            <h3>User Demographics</h3>
+            <p>View user distribution, roles, and activity patterns</p>
+            <button class="btn-primary btn-sm" style="margin-top:12px; width:100%;">Generate →</button>
+        </div>
+        <div class="card" onclick="generateReport('performance')">
+            <div class="card-icon">🎮</div>
+            <h3>Game Performance</h3>
+            <p>Analyze which games are popular and their performance metrics</p>
+            <button class="btn-primary btn-sm" style="margin-top:12px; width:100%;">Generate →</button>
+        </div>
+        <div class="card" onclick="generateReport('leaderboard')">
+            <div class="card-icon">📈</div>
+            <h3>Leaderboard Report</h3>
+            <p>Export leaderboard data and player rankings</p>
+            <button class="btn-primary btn-sm" style="margin-top:12px; width:100%;">Generate →</button>
+        </div>
+        <div class="card" onclick="generateReport('schedule')">
+            <div class="card-icon">📅</div>
+            <h3>Schedule Report</h3>
+            <p>View upcoming events and schedule compliance</p>
+            <button class="btn-primary btn-sm" style="margin-top:12px; width:100%;">Generate →</button>
+        </div>
+        <div class="card" onclick="generateReport('messages')">
+            <div class="card-icon">💌</div>
+            <h3>Contact Messages</h3>
+            <p>View all contact form submissions and inquiries</p>
+            <button class="btn-primary btn-sm" style="margin-top:12px; width:100%;">Generate →</button>
+        </div>
+    </div>
+
+    <!-- Messages Table -->
+    <div class="glass-card">
+        <h3 style="margin-bottom:16px;">📨 Recent Contact Messages</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Message Preview</th>
+                    </tr>
+                </thead>
+                <tbody id="messagesTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color:var(--text-muted);">Loading messages...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js"></script>
+<script>
+    const user = localStorage.getItem('user');
+    if (!user) { window.location.href = '../index.html'; }
+    else {
+        const userData = JSON.parse(user);
+        if (userData.role !== 'admin') { alert('Admin access only!'); window.location.href = '../index.html'; }
+    }
+
+    function generateReport(type) {
+        alert(`Generating ${type} report... (Feature coming soon)`);
+    }
+
+    const loadMessages = async () => {
+        try {
+            const data = await apiRequest('/contacts');
+            const table = document.getElementById('messagesTableBody');
+            if (data.success && data.contacts && data.contacts.length > 0) {
+                table.innerHTML = data.contacts.slice(-10).reverse().map(msg => `
+                    <tr>
+                        <td>${msg.timestamp ? new Date(msg.timestamp).toLocaleDateString() : 'N/A'}</td>
+                        <td><strong>${msg.name || 'N/A'}</strong></td>
+                        <td>${msg.email || 'N/A'}</td>
+                        <td>${msg.subject || 'N/A'}</td>
+                        <td style="color:var(--text-muted);">${(msg.message || '').substring(0, 50)}...</td>
+                    </tr>
+                `).join('');
+            } else {
+                table.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px; color:var(--text-muted);">No messages yet</td></tr>';
+            }
+        } catch (error) {
+            console.error('Error loading messages:', error);
+        }
+    };
+
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+    }
+    loadMessages();
+</script>
+</body>
+</html>

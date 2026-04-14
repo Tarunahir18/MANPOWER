@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games & Enrollment – MANPOWER Sports</title>
+    <meta name="description" content="Browse and enroll in 30+ sports at MANPOWER Sports Management System.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    if(!localStorage.getItem('user')){
+        alert("Please login first.");
+        window.location.href = "../index.html";
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div class="theme-controller" onclick="toggleTheme()">
+            <div class="indicator"></div>
+            <div class="segment dark active">🌙</div>
+            <div class="segment light">☀</div>
+        </div>
+        <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="store.html">🛒 Store</a>
+        <a href="profile.html" class="user-only">👤 Profile</a>
+        <a href="games.html" class="active">🎮 Games</a>
+        <a href="leaderboard.html" class="user-only">🏆 Leaderboard</a>
+        <a href="schedules.html" class="user-only">📅 Schedules</a>
+        <a href="results.html" class="user-only">📊 Results</a>
+        <a href="news.html" class="user-only">📰 News</a>
+        <a href="admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+        <a href="admin-users.html" class="admin-only">👥 Users</a>
+        <a href="admin-reports.html" class="admin-only">📑 Reports</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>🎮 Games & Enrollment</h1>
+        <p>Search, filter and join any sports team below</p>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrapper">
+        <input type="text" id="searchBox" placeholder="Search for a sport (e.g. Football, Chess)...">
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+        <label class="filter-btn" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="indoorFilter" style="width:auto; accent-color:var(--primary); cursor:pointer;"> Indoor
+        </label>
+        <label class="filter-btn" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="outdoorFilter" style="width:auto; accent-color:var(--primary); cursor:pointer;"> Outdoor
+        </label>
+        <label class="filter-btn" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="combatFilter" style="width:auto; accent-color:var(--primary); cursor:pointer;"> Combat
+        </label>
+    </div>
+
+    <!-- Games List -->
+    <ul id="gameList" class="game-list">
+        <li>Archery</li>
+        <li>Athletics</li>
+        <li>Badminton</li>
+        <li>Basketball</li>
+        <li>Boxing</li>
+        <li>Chess</li>
+        <li>Cycling</li>
+        <li>Equestrian</li>
+        <li>Fencing</li>
+        <li>Football</li>
+        <li>Gymnastics</li>
+        <li>Handball</li>
+        <li>Hockey</li>
+        <li>Judo</li>
+        <li>Kabaddi</li>
+        <li>Karate</li>
+        <li>Kho-Kho</li>
+        <li>Lawn Tennis</li>
+        <li>Malkham</li>
+        <li>Roll Ball</li>
+        <li>Shooting Ball</li>
+        <li>Skating</li>
+        <li>Soft Tennis</li>
+        <li>Sport Climbing</li>
+        <li>Swimming</li>
+        <li>Table Tennis</li>
+        <li>Taekwondo</li>
+        <li>Tug of War</li>
+        <li>Volleyball</li>
+        <li>Weight Lifting</li>
+        <li>Wrestling</li>
+        <li>Yogasan</li>
+    </ul>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="../assets/js/script.js"></script>
+<script>
+    const searchBox = document.getElementById('searchBox');
+    const gameListItems = document.querySelectorAll('#gameList li');
+    const toastDiv = document.getElementById('toast');
+
+    function showFeedback(msg) {
+        toastDiv.innerText = msg;
+        toastDiv.style.display = "block";
+        setTimeout(() => toastDiv.style.display = "none", 3000);
+    }
+
+    // Enhance list with Enroll buttons
+    gameListItems.forEach(li => {
+        const gameName = li.innerText.trim();
+        li.style.cursor = 'pointer';
+        li.innerHTML = `
+            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">${gameName}</span>
+            <span class="enroll-btn">View Info & Enroll →</span>
+        `;
+        li.onclick = () => {
+            window.location.assign("sport.html?game=" + encodeURIComponent(gameName));
+        };
+    });
+
+    // Search functionality
+    searchBox.addEventListener('input', filterGames);
+    indoorFilter.addEventListener('change', filterGames);
+    outdoorFilter.addEventListener('change', filterGames);
+    combatFilter.addEventListener('change', filterGames);
+
+    function filterGames() {
+        const query = searchBox.value.toLowerCase();
+        const showIndoor = indoorFilter.checked;
+        const showOutdoor = outdoorFilter.checked;
+        const showCombat = combatFilter.checked;
+
+        gameListItems.forEach(li => {
+            const gameName = li.innerText.toLowerCase();
+            const matchesSearch = gameName.includes(query);
+
+            const indoorGames = ['badminton', 'table tennis', 'chess', 'basketball', 'volleyball', 'handball', 'kabaddi', 'soft tennis', 'lawn tennis', 'squash', 'swimming', 'gymnastics', 'weight lifting', 'yogasan'];
+            const outdoorGames = ['football', 'athletics', 'cycling', 'archery', 'shooting ball', 'roll ball', 'basketball', 'volleyball', 'handball', 'kabaddi', 'hockey', 'cricket', 'baseball', 'rugby', 'wrestling', 'boxing', 'judo', 'karate', 'taekwondo', 'fencing'];
+            const combatGames = ['boxing', 'judo', 'karate', 'taekwondo', 'fencing', 'wrestling', 'malkham'];
+
+            const isIndoor = indoorGames.includes(gameName);
+            const isOutdoor = outdoorGames.includes(gameName);
+            const isCombat = combatGames.includes(gameName);
+
+            const matchesFilter = (!showIndoor && !showOutdoor && !showCombat) || 
+                                  (showIndoor && isIndoor) || 
+                                  (showOutdoor && isOutdoor) || 
+                                  (showCombat && isCombat);
+
+            li.style.display = matchesSearch && matchesFilter ? 'flex' : 'none';
+        });
+    }
+
+    searchBox.addEventListener('keyup', () => {
+        const filter = searchBox.value.toLowerCase();
+        gameListItems.forEach(li => {
+            const text = li.querySelector('span').innerText.toLowerCase();
+            li.style.display = text.includes(filter) ? "flex" : "none";
+        });
+    });
+
+    searchBox.addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') {
+            const visible = Array.from(gameListItems).filter(li => li.style.display !== 'none');
+            if(visible.length === 1) {
+                const gameName = visible[0].querySelector('span').innerText;
+                handleEnroll(gameName);
+            }
+        }
+    });
+
+    // Role-based menu
+    const user = localStorage.getItem('user');
+    if (user) {
+        const userData = JSON.parse(user);
+        document.querySelectorAll('.admin-only').forEach(link => link.classList.toggle('show', userData.role === 'admin'));
+        document.querySelectorAll('.user-only').forEach(link => link.classList.toggle('show', userData.role !== 'admin'));
+    }
+
+    // Logout & Menu
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard – MANPOWER Sports</title>
+    <meta name="description" content="View sports leaderboard rankings, scores and performance at MANPOWER.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    if(!localStorage.getItem('user')){
+        window.location.href = '../index.html';
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div class="theme-controller" onclick="toggleTheme()">
+            <div class="indicator"></div>
+            <div class="segment dark active">🌙</div>
+            <div class="segment light">☀</div>
+        </div>
+        <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="store.html">🛒 Store</a>
+        <a href="profile.html">👤 Profile</a>
+        <a href="games.html">🎮 Games</a>
+        <a href="leaderboard.html" class="active">🏆 Leaderboard</a>
+        <a href="schedules.html">📅 Schedules</a>
+        <a href="results.html">📊 Results</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>🏆 Leaderboard</h1>
+        <p>Top performers across all sports categories</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar" id="filterButtons">
+        <button class="filter-btn active" onclick="filterLeaderboard('all', this)">All Games</button>
+        <button class="filter-btn" onclick="filterLeaderboard('football', this)">⚽ Football</button>
+        <button class="filter-btn" onclick="filterLeaderboard('cricket', this)">🏏 Cricket</button>
+        <button class="filter-btn" onclick="filterLeaderboard('badminton', this)">🏸 Badminton</button>
+        <button class="filter-btn" onclick="filterLeaderboard('chess', this)">♟️ Chess</button>
+    </div>
+
+    <!-- Leaderboard Table -->
+    <div class="glass-card" style="padding:0; overflow:hidden;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Profile</th>
+                    <th>Player Name</th>
+                    <th>Game</th>
+                    <th>Score</th>
+                    <th>Wins</th>
+                    <th>Performance</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+                <tr data-game="chess" style="background: rgba(255,215,0,0.06);">
+                    <td><span style="font-size:18px;">🥇</span> <strong style="color:var(--primary);">1</strong></td>
+                    <td>
+                        <div class="profile-avatar" style="width:44px; height:44px; border:2px solid var(--primary);">
+                            <img src="../assets/images/anand.png" alt="Anand" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                        </div>
+                    </td>
+                    <td><strong>Viswanathan Anand</strong></td>
+                    <td><span class="badge badge-accent">Chess</span></td>
+                    <td style="color:var(--primary); font-weight:700;">2850</td>
+                    <td>45</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                </tr>
+                <tr data-game="chess" style="background: rgba(192,192,192,0.04);">
+                    <td><span style="font-size:18px;">🥈</span> <strong style="color:var(--primary);">2</strong></td>
+                    <td>
+                        <div class="profile-avatar" style="width:44px; height:44px; border:2px solid var(--text-muted);">
+                            <img src="../assets/images/gukesh.png" alt="Gukesh" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                        </div>
+                    </td>
+                    <td><strong>Gukesh D.</strong></td>
+                    <td><span class="badge badge-accent">Chess</span></td>
+                    <td style="color:var(--primary); font-weight:700;">2700</td>
+                    <td>42</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                </tr>
+                <tr data-game="chess" style="background: rgba(205,127,50,0.04);">
+                    <td><span style="font-size:18px;">🥉</span> <strong style="color:var(--primary);">3</strong></td>
+                    <td>
+                        <div class="profile-avatar" style="width:44px; height:44px; border:2px solid #cd7f32;">
+                            <img src="../assets/images/deshmukh.png" alt="Divya" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                        </div>
+                    </td>
+                    <td><strong>Divya Deshmukh</strong></td>
+                    <td><span class="badge badge-accent">Chess</span></td>
+                    <td style="color:var(--primary); font-weight:700;">2550</td>
+                    <td>40</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                </tr>
+                <tr data-game="football">
+                    <td><strong style="color:var(--text-muted);">4</strong></td>
+                    <td><div class="profile-avatar" style="width:44px; height:44px;">⚽</div></td>
+                    <td><strong>Rahul Sharma</strong></td>
+                    <td><span class="badge badge-success">Football</span></td>
+                    <td style="color:var(--primary); font-weight:700;">2500</td>
+                    <td>38</td>
+                    <td>⭐⭐⭐⭐</td>
+                </tr>
+                <tr data-game="cricket">
+                    <td><strong style="color:var(--text-muted);">5</strong></td>
+                    <td><div class="profile-avatar" style="width:44px; height:44px;">🏏</div></td>
+                    <td><strong>Amit Patel</strong></td>
+                    <td><span class="badge badge-info">Cricket</span></td>
+                    <td style="color:var(--primary); font-weight:700;">2100</td>
+                    <td>30</td>
+                    <td>⭐⭐⭐⭐</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js"></script>
+<script>
+    function filterLeaderboard(game, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        const rows = document.querySelectorAll('#leaderboardBody tr');
+        rows.forEach(row => {
+            if (game === 'all') {
+                row.style.display = '';
+            } else {
+                row.style.display = row.dataset.game === game ? '' : 'none';
+            }
+        });
+    }
+
+    // Logout & Menu
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+    }
+</script>
+</body>
+</html>

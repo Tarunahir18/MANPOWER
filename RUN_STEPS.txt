@@ -1,0 +1,4 @@
+1) Install Node.js
+2) Double-click start-server.bat
+3) Wait until terminal shows: Server is running on http://localhost:3000 or another free port
+4) Open index.html with Live Server OR open the shown localhost link in browser

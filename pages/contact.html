@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us – MANPOWER Sports Management</title>
+    <meta name="description" content="Get in touch with the MANPOWER Sports Department at P P Savani University. Phone, email, Instagram, and location details.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    const loggedInUser = localStorage.getItem('user');
+    if(!loggedInUser){
+        alert("You must be logged in to access this page.");
+        window.location.href = "../index.html";
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div class="theme-controller" onclick="toggleTheme()">
+            <div class="indicator"></div>
+            <div class="segment dark active">🌙</div>
+            <div class="segment light">☀</div>
+        </div>
+        <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="store.html">🛒 Store</a>
+        <a href="profile.html" class="user-only">👤 Profile</a>
+        <a href="games.html" class="user-only">🎮 Games</a>
+        <a href="leaderboard.html" class="user-only">🏆 Leaderboard</a>
+        <a href="schedules.html" class="user-only">📅 Schedules</a>
+        <a href="results.html" class="user-only">📊 Results</a>
+        <a href="news.html" class="user-only">📰 News</a>
+        <a href="admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+        <a href="admin-users.html" class="admin-only">👥 Users</a>
+        <a href="admin-reports.html" class="admin-only">📑 Reports</a>
+        <a href="contact.html" class="active">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <!-- Page Header -->
+    <div class="page-header" style="text-align:center;">
+        <h1>Get In Touch</h1>
+        <p>We'd love to hear from you! Reach out via any of the channels below.</p>
+    </div>
+
+    <!-- Contact Info Cards -->
+    <div class="contact-grid" style="margin-bottom:32px;">
+        <div class="contact-item">
+            <div class="contact-icon">📞</div>
+            <div class="contact-detail">
+                <h4>Phone Numbers</h4>
+                <p>General: <a href="tel:+919879608000">+91 98796 08000</a></p>
+                <p>Sports Dept: <a href="tel:+919512035605">+91 95120 35605</a></p>
+                <p>Admissions: <a href="tel:+919879608000">+91 98796 08000</a></p>
+            </div>
+        </div>
+        <div class="contact-item">
+            <div class="contact-icon">✉️</div>
+            <div class="contact-detail">
+                <h4>Email Addresses</h4>
+                <p>Sports: <a href="mailto:sport@ppsu.ac.in">sport@ppsu.ac.in</a></p>
+                <p>Admissions: <a href="mailto:admission@ppsu.ac.in">admission@ppsu.ac.in</a></p>
+                <p>General: <a href="mailto:info@ppsu.ac.in">info@ppsu.ac.in</a></p>
+            </div>
+        </div>
+        <div class="contact-item">
+            <div class="contact-icon">📸</div>
+            <div class="contact-detail">
+                <h4>Social Media</h4>
+                <p>Instagram: <a href="https://instagram.com/ppsu_official" target="_blank">@ppsu_official</a></p>
+                <p>Sports IG: <a href="https://instagram.com/ppsu_sports" target="_blank">@ppsu_sports</a></p>
+                <p>Twitter/X: <a href="https://twitter.com/ppsavani_uni" target="_blank">@ppsavani_uni</a></p>
+            </div>
+        </div>
+        <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div class="contact-detail">
+                <h4>Campus Location</h4>
+                <p>P P Savani University,<br>
+                   NH-8, GETCO, Near Biltech,<br>
+                   Village Dhamdod, Kosamba,<br>
+                   Dist. Surat, Gujarat 394125, India</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Working Hours & Extra Info -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:32px;">
+        <div class="glass-card glass-card-sm">
+            <h3 style="margin-bottom:12px;">🕐 Office Hours</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+                    <span style="color:var(--text-secondary); font-size:14px;">Monday – Friday</span>
+                    <span style="color:var(--primary); font-weight:600; font-size:14px;">9:00 AM – 6:00 PM</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+                    <span style="color:var(--text-secondary); font-size:14px;">Saturday</span>
+                    <span style="color:var(--primary); font-weight:600; font-size:14px;">9:00 AM – 1:00 PM</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="color:var(--text-secondary); font-size:14px;">Sunday</span>
+                    <span style="color:var(--danger); font-weight:600; font-size:14px;">Closed</span>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card glass-card-sm">
+            <h3 style="margin-bottom:12px;">🔗 Quick Links</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <a href="https://ppsu.ac.in" target="_blank" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--bg-input); border-radius:var(--radius-sm); font-size:14px; color:var(--text-secondary); transition:var(--transition-fast);">
+                    🌐 <span>PPSU Official Website</span>
+                </a>
+                <a href="about.html" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--bg-input); border-radius:var(--radius-sm); font-size:14px; color:var(--text-secondary); transition:var(--transition-fast);">
+                    ℹ️ <span>About MANPOWER</span>
+                </a>
+                <a href="games.html" style="display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--bg-input); border-radius:var(--radius-sm); font-size:14px; color:var(--text-secondary); transition:var(--transition-fast);">
+                    🎮 <span>Browse Sports & Enroll</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Contact Form -->
+    <div class="glass-card" style="max-width:700px; margin: 0 auto 32px;">
+        <h2 style="margin-bottom:6px; text-align:center;">📬 Send Us a Message</h2>
+        <p style="text-align:center; margin-bottom:24px; font-size:14px;">Have a query or feedback? Fill out the form below and we'll get back to you.</p>
+
+        <form id="contactForm">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required placeholder="Enter your full name">
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="your.email@ppsu.ac.in">
+
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" required placeholder="What is this regarding?">
+
+            <label for="message">Message</label>
+            <textarea id="message" name="message" required placeholder="Type your message here..." style="height: 120px; resize: vertical;"></textarea>
+
+            <button type="submit" class="btn-primary" style="width:100%; margin-top:16px;">Send Message ✉️</button>
+        </form>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Google Map -->
+    <div style="text-align:center; margin-bottom:16px;">
+        <h2>📍 Find Us On The Map</h2>
+        <p style="margin-top:6px;">P P Savani University, Kosamba, Surat, Gujarat</p>
+    </div>
+    <div class="map-wrapper">
+        <iframe 
+            src="https://www.google.com/maps?q=P%20P%20Savani%20University%20Kosamba%20Surat%20Gujarat&output=embed"
+            allowfullscreen loading="lazy">
+        </iframe>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2026 MANPOWER Sports Management System – P P Savani University</p>
+        <p style="margin-top:6px;"><a href="about.html">About Us</a> · <a href="../index.html">Home</a></p>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js"></script>
+<script>
+    const contactForm = document.getElementById('contactForm');
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(contactForm);
+        const data = Object.fromEntries(formData);
+        
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = "Sending...";
+        submitBtn.disabled = true;
+
+        try {
+            const res = await fetch(`${await detectApiUrl()}/contact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            if (result.success) {
+                if (typeof toasty === 'function') {
+                    toasty('Message sent successfully! We will get back to you soon.', 'success');
+                } else {
+                    alert('Message sent successfully!');
+                }
+                contactForm.reset();
+            } else {
+                if (typeof toasty === 'function') {
+                     toasty('Error: ' + result.message, 'error');
+                } else {
+                     alert('Error sending message: ' + result.message);
+                }
+            }
+        } catch (err) {
+            if (typeof toasty === 'function') {
+                toasty('Network Error: Cannot connect to backend.', 'error');
+            } else {
+                alert('Network Error: ' + err.message);
+            }
+        } finally {
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Mobile menu
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('expanded');
+                menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰';
+            });
+        }
+        // Role-based nav
+        const user = localStorage.getItem('user');
+        if (user) {
+            try {
+                const userData = JSON.parse(user);
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('show', userData.role === 'admin'));
+                document.querySelectorAll('.user-only').forEach(el => el.classList.toggle('show', userData.role !== 'admin'));
+            } catch(e) {}
+        }
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+        }
+    });
+</script>
+
+<script>
+async function detectApiUrl() {
+    if (window.getApiUrl) return await window.getApiUrl();
+    return 'http://localhost:3000/api/v1';
+}
+</script>
+</body>
+</html>

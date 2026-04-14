@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us – MANPOWER Sports Management</title>
+    <meta name="description" content="Learn about MANPOWER Sports Management System – built for P P Savani University to manage sports enrollment, tournaments, and athlete performance.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<script>
+    const loggedInUser = localStorage.getItem('user');
+    if(!loggedInUser){
+        alert("You must be logged in to access this page.");
+        window.location.href = "../index.html";
+    }
+</script>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div class="theme-controller" onclick="toggleTheme()">
+            <div class="indicator"></div>
+            <div class="segment dark active">🌙</div>
+            <div class="segment light">☀</div>
+        </div>
+        <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html" class="active">ℹ️ About</a>
+        <a href="store.html">🛒 Store</a>
+        <a href="profile.html" class="user-only">👤 Profile</a>
+        <a href="games.html" class="user-only">🎮 Games</a>
+        <a href="leaderboard.html" class="user-only">🏆 Leaderboard</a>
+        <a href="schedules.html" class="user-only">📅 Schedules</a>
+        <a href="results.html" class="user-only">📊 Results</a>
+        <a href="news.html" class="user-only">📰 News</a>
+        <a href="admin-dashboard.html" class="admin-only">📈 Dashboard</a>
+        <a href="admin-users.html" class="admin-only">👥 Users</a>
+        <a href="admin-reports.html" class="admin-only">📑 Reports</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <!-- Page Header -->
+    <div class="page-header" style="text-align:center; margin-bottom:40px;">
+        <div style="margin-bottom:16px;">
+            <img src="../assets/images/manpower-logo.png" alt="MANPOWER Logo" style="height:100px; border-radius:16px; box-shadow: 0 10px 40px rgba(232,104,15,0.15);">
+        </div>
+        <h1>About MANPOWER</h1>
+        <p style="max-width:600px; margin:8px auto 0;">The Ultimate Sports Management System for P P Savani University</p>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h2 style="margin-bottom:12px;">🎯 Our Mission</h2>
+        <p style="font-size:15px; line-height:1.8; color:var(--text-secondary);">
+            <strong style="color:var(--primary);">MANPOWER</strong> is a comprehensive, state-of-the-art Sports Management System designed exclusively for
+            <strong style="color:var(--text-primary);">P P Savani University (PPSU)</strong>, Kosamba, Surat, Gujarat.
+            Our platform empowers students to discover, enroll in, and track their sports activities seamlessly.
+            We bridge the gap between students, coaches and administrators — making sports participation organized,
+            accessible and engaging for everyone on campus.
+        </p>
+    </div>
+
+    <!-- What We Offer -->
+    <h2 style="margin-bottom:16px;">🚀 What We Offer</h2>
+    <div class="about-grid" style="margin-bottom:32px;">
+        <div class="about-card">
+            <span class="icon">🎮</span>
+            <h3>30+ Sports</h3>
+            <p>From Football and Cricket to Chess and Yogasan – browse and enroll in over 30 sports categories offered at PPSU.</p>
+        </div>
+        <div class="about-card">
+            <span class="icon">🏟️</span>
+            <h3>Live Tournaments</h3>
+            <p>Admins launch tournaments with real-time notifications sent to all students. RSVP and compete for glory!</p>
+        </div>
+        <div class="about-card">
+            <span class="icon">📊</span>
+            <h3>Performance Tracking</h3>
+            <p>Track your enrolled games, activity history, achievement badges, and standings on the leaderboard.</p>
+        </div>
+        <div class="about-card">
+            <span class="icon">📅</span>
+            <h3>Schedules & Events</h3>
+            <p>Stay updated with upcoming practice sessions, tournaments, and campus sports events — all in one place.</p>
+        </div>
+        <div class="about-card">
+            <span class="icon">🔔</span>
+            <h3>Instant Notifications</h3>
+            <p>Receive alerts for new tournaments, schedule changes, and important announcements in real-time.</p>
+        </div>
+        <div class="about-card">
+            <span class="icon">👤</span>
+            <h3>Role-Based Access</h3>
+            <p>Students, Coaches, and Admins each have tailored dashboards with features specific to their role.</p>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- About the University -->
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h2 style="margin-bottom:12px;">🏫 About P P Savani University</h2>
+        <p style="font-size:15px; line-height:1.8; color:var(--text-secondary);">
+            P P Savani University is a premier private university located at <strong style="color:var(--text-primary);">NH-8, Village Dhamdod, Kosamba, Dist. Surat, Gujarat – 394125, India</strong>.
+            Established with a vision to provide world-class education, PPSU is recognized for its modern infrastructure, innovative teaching,
+            and a strong focus on holistic student development. The Sports Department at PPSU is committed to nurturing athletic talent,
+            promoting physical fitness, and building a competitive sports culture across all disciplines.
+        </p>
+        <div style="margin-top:20px; display:flex; gap:16px; flex-wrap:wrap;">
+            <div class="badge badge-success">🏆 Multi-Sport Facilities</div>
+            <div class="badge badge-info">🎓 NAAC Accredited</div>
+            <div class="badge badge-accent">🌍 Gujarat, India</div>
+            <div class="badge badge-warning">📧 sport@ppsu.ac.in</div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="glass-card" style="margin-bottom:24px;">
+        <h2 style="margin-bottom:12px;">💻 Technology Behind MANPOWER</h2>
+        <p style="font-size:14px; line-height:1.8; color:var(--text-secondary); margin-bottom:16px;">
+            MANPOWER is built using modern web technologies to deliver a blazing-fast, responsive, and secure platform.
+        </p>
+        <div class="stats-grid" style="margin-bottom:0;">
+            <div class="stat-card" style="text-align:center;">
+                <div class="stat-icon" style="margin:0 auto 10px;">🌐</div>
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:4px;">Frontend</div>
+                <div style="font-size:13px; color:var(--text-muted);">HTML5, CSS3, JavaScript</div>
+            </div>
+            <div class="stat-card" style="text-align:center;">
+                <div class="stat-icon" style="margin:0 auto 10px;">⚙️</div>
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:4px;">Backend</div>
+                <div style="font-size:13px; color:var(--text-muted);">Node.js, Express.js</div>
+            </div>
+            <div class="stat-card" style="text-align:center;">
+                <div class="stat-icon" style="margin:0 auto 10px;">💾</div>
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:4px;">Database</div>
+                <div style="font-size:13px; color:var(--text-muted);">JSON File-Based Storage</div>
+            </div>
+            <div class="stat-card" style="text-align:center;">
+                <div class="stat-icon" style="margin:0 auto 10px;">🎨</div>
+                <div style="font-weight:700; color:var(--text-primary); margin-bottom:4px;">Design</div>
+                <div style="font-size:13px; color:var(--text-muted);">Glassmorphism, Dark UI</div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Team / Credits -->
+    <div style="text-align:center; margin-bottom:32px;">
+        <h2 style="margin-bottom:12px;">👨‍💻 Meet the Team</h2>
+        <p style="max-width:500px; margin:0 auto 24px; color:var(--text-muted);">MANPOWER was developed by the PPSU Sports Department Tech Team.</p>
+        <div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;">
+            <div class="glass-card glass-card-sm" style="min-width:220px; text-align:center;">
+                <div style="width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--accent)); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:28px; color:#ffffff; font-weight:800;">T</div>
+                <h3 style="font-size:16px; color:var(--text-primary);">Tarun</h3>
+                <p style="font-size:12px; color:var(--text-muted);">Lead Developer</p>
+            </div>
+            <div class="glass-card glass-card-sm" style="min-width:220px; text-align:center;">
+                <div style="width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg, var(--accent), var(--primary)); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:28px; color:#ffffff; font-weight:800;">P</div>
+                <h3 style="font-size:16px; color:var(--text-primary);">PPSU Sports Dept.</h3>
+                <p style="font-size:12px; color:var(--text-muted);">Project Sponsor</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2026 MANPOWER Sports Management System – P P Savani University, Kosamba, Gujarat.</p>
+        <p style="margin-top:6px;"><a href="contact.html">Contact Us</a> · <a href="../index.html">Home</a></p>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('expanded');
+                menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰';
+            });
+        }
+        // Role-based nav links
+        const user = localStorage.getItem('user');
+        if (user) {
+            try {
+                const userData = JSON.parse(user);
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('show', userData.role === 'admin'));
+                document.querySelectorAll('.user-only').forEach(el => el.classList.toggle('show', userData.role !== 'admin'));
+            } catch(e) {}
+        }
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+        }
+    });
+</script>
+</body>
+</html>

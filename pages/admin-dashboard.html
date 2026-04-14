@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – MANPOWER Sports</title>
+    <meta name="description" content="Admin dashboard for MANPOWER Sports Management System.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <button class="nav-hamburger" id="menuToggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="admin-dashboard.html" class="active">📈 Dashboard</a>
+        <a href="admin-users.html">👥 Users</a>
+        <a href="admin-reports.html">📑 Reports</a>
+        <a href="analytics.html">📊 Analytics</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container-wide">
+
+    <div class="page-header">
+        <h1>📊 Admin Dashboard</h1>
+        <p>Overview of platform activity and management tools</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number" id="totalUsers">--</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎮</div>
+            <div class="stat-number" id="totalEnrollments">--</div>
+            <div class="stat-label">Enrollments</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-number" id="activeUsers">--</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📨</div>
+            <div class="stat-number" id="messages">--</div>
+            <div class="stat-label">Messages</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:32px;">
+        <button class="btn-primary" onclick="location.href='admin-users.html'">👥 Manage Users</button>
+        <button class="btn-secondary" onclick="location.href='contact.html'">📨 View Messages</button>
+        <button class="btn-secondary" onclick="exportData()">📥 Export Data</button>
+        <button class="btn-secondary" onclick="generateReport()">📄 Generate Report</button>
+    </div>
+
+    <!-- Charts -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:20px;">
+        <div class="chart-container">
+            <h3>🏆 Top Enrolled Games</h3>
+            <div class="chart-bar"><div class="chart-label">Football</div><div class="chart-fill" style="width: 85%;"></div><div class="chart-value">45 users</div></div>
+            <div class="chart-bar"><div class="chart-label">Cricket</div><div class="chart-fill" style="width: 72%;"></div><div class="chart-value">38 users</div></div>
+            <div class="chart-bar"><div class="chart-label">Badminton</div><div class="chart-fill" style="width: 68%;"></div><div class="chart-value">36 users</div></div>
+            <div class="chart-bar"><div class="chart-label">Chess</div><div class="chart-fill" style="width: 55%;"></div><div class="chart-value">29 users</div></div>
+            <div class="chart-bar"><div class="chart-label">Volleyball</div><div class="chart-fill" style="width: 42%;"></div><div class="chart-value">22 users</div></div>
+        </div>
+
+        <div class="chart-container">
+            <h3>📈 Monthly Activity</h3>
+            <div class="chart-bar"><div class="chart-label">January</div><div class="chart-fill" style="width: 60%;"></div><div class="chart-value">42 enrolls</div></div>
+            <div class="chart-bar"><div class="chart-label">February</div><div class="chart-fill" style="width: 75%;"></div><div class="chart-value">53 enrolls</div></div>
+            <div class="chart-bar"><div class="chart-label">March</div><div class="chart-fill" style="width: 90%;"></div><div class="chart-value">63 enrolls</div></div>
+            <div class="chart-bar"><div class="chart-label">April</div><div class="chart-fill" style="width: 45%; background: linear-gradient(90deg, var(--accent), #a788ff);"></div><div class="chart-value">31 enrolls</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js"></script>
+<script>
+    // Check admin access
+    const user = localStorage.getItem('user');
+    if (!user) { window.location.href = '../index.html'; }
+    else {
+        const userData = JSON.parse(user);
+        if (userData.role !== 'admin') { alert('Admin access only!'); window.location.href = '../index.html'; }
+    }
+
+    const loadStats = async () => {
+        try {
+            const data = await apiRequest('/users');
+            if (data.success && data.users) {
+                const users = data.users;
+                const totalUsers = Object.keys(users).length;
+                let totalEnrollments = 0, activeUsers = 0;
+                Object.values(users).forEach(user => {
+                    const enrolled = user.enrolled || [];
+                    totalEnrollments += enrolled.length;
+                    if (enrolled.length > 0) activeUsers++;
+                });
+                document.getElementById('totalUsers').innerText = totalUsers;
+                document.getElementById('totalEnrollments').innerText = totalEnrollments;
+                document.getElementById('activeUsers').innerText = activeUsers;
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+            document.getElementById('totalUsers').innerText = '0';
+            document.getElementById('totalEnrollments').innerText = '0';
+            document.getElementById('activeUsers').innerText = '0';
+        }
+        try {
+            const contactData = await apiRequest('/contacts');
+            document.getElementById('messages').innerText = contactData.contacts?.length || 0;
+        } catch (e) {
+            document.getElementById('messages').innerText = '0';
+        }
+    };
+
+    function exportData() { alert('Exporting data... (Feature coming soon)'); }
+    function generateReport() { alert('Generating report... (Feature coming soon)'); }
+
+    document.getElementById('logoutBtn').onclick = (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => { navLinks.classList.toggle('expanded'); menuToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; });
+    }
+    loadStats();
+</script>
+</body>
+</html>

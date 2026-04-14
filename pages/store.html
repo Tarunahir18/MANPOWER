@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store – MANPOWER Sports</title>
+    <meta name="description" content="Shop premium sports gear, jerseys, and equipment at the MANPOWER Store.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            height: 250px;
+            position: relative;
+            background: #111;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .product-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-info h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .product-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            border-left: 1px solid var(--border-default);
+            z-index: 1001;
+            padding: 30px;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .cart-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .cart-footer {
+            border-top: 1px solid var(--border-default);
+            padding-top: 20px;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+        }
+
+        .cart-overlay.open {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .cart-sidebar { width: 100%; }
+        }
+
+        /* Light Theme Overrides for Store */
+        .light-theme .product-info h3,
+        .light-theme .product-info p,
+        .light-theme .cart-header h2,
+        .light-theme .cart-item div,
+        .light-theme .cart-total {
+            color: #0f172a !important;
+        }
+
+        .light-theme .product-card {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        .light-theme .cart-sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-left-color: #e2e8f0;
+        }
+
+        .light-theme .upi-id-box {
+            background: #f1f5f9;
+            color: #E8680F;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Sports Management</span>
+        </div>
+    </a>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div id="cartTrigger" class="glass-card" style="padding: 8px 15px; cursor:pointer; display:flex; gap:10px; align-items:center;">
+            <span>🛒</span> <strong id="cartCount">0</strong>
+        </div>
+        <div class="theme-controller" onclick="toggleTheme()">
+            <div class="indicator"></div>
+            <div class="segment dark active">🌙</div>
+            <div class="segment light">☀</div>
+        </div>
+        <button class="nav-hamburger" id="menuToggle">☰</button>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="../index.html">🏠 Home</a>
+        <a href="about.html">ℹ️ About</a>
+        <a href="profile.html">👤 Profile</a>
+        <a href="games.html">🎮 Games</a>
+        <a href="store.html" class="active">🛒 Store</a>
+        <a href="leaderboard.html">🏆 Leaderboard</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container">
+    <div class="page-header" style="text-align: left;">
+        <h1>MANPOWER <span style="color:var(--primary);">Store</span></h1>
+        <p>Premium gear and equipment for elite performance</p>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="filter-bar" id="categoryFilters">
+        <button class="filter-btn active" onclick="filterCategory('All', this)">All Items</button>
+        <button class="filter-btn" onclick="filterCategory('Jerseys', this)">👕 Jerseys</button>
+        <button class="filter-btn" onclick="filterCategory('Equipment', this)">⚽ Equipment</button>
+        <button class="filter-btn" onclick="filterCategory('Supplements', this)">💊 Supplements</button>
+    </div>
+
+    <!-- Products -->
+    <div class="store-grid" id="productGrid">
+        <!-- Products will be injected here -->
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="payment-modal" id="paymentModal">
+    <div class="payment-card">
+        <button class="close-btn" onclick="closePayment()">✕</button>
+        <h2 style="margin-bottom: 5px;">Scan & Pay</h2>
+        <p style="color: var(--text-muted);">Secure UPI Payment via QR Code</p>
+        
+        <div class="qr-container">
+            <img src="../assets/images/payment-qr.png" alt="Payment QR Code">
+        </div>
+
+        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">UPI ID</div>
+        <div class="upi-id-box">valatarunbhupatbhai-1@oksbi</div>
+
+        <ul class="instruction-list">
+            <li>Scan the QR code using any UPI app (GPay, PhonePe, Paytm).</li>
+            <li>Complete the payment of <strong id="modalAmount">$0.00</strong>.</li>
+            <li>Note down the Transaction ID (UTR).</li>
+        </ul>
+
+        <label style="display:block; text-align:left; margin-bottom:8px; font-weight:700;">Enter Transaction ID (UTR)</label>
+        <input type="text" id="utrInput" placeholder="12-digit Transaction ID" style="width:100%; padding:12px; margin-bottom:20px; border-radius:12px; border:1px solid var(--border-default); background:var(--bg-input); color:var(--text-primary);">
+
+        <button class="btn-primary" style="width:100%;" onclick="verifyManualPayment()">Verify & Confirm Order 🚀</button>
+    </div>
+</div>
+
+<script src="../assets/js/script.js"></script>
+<script>
+    let allProducts = [];
+    let cart = JSON.parse(localStorage.getItem('mp_cart') || '[]');
+
+    async function loadProducts() {
+        try {
+            const res = await fetch('/api/products');
+            allProducts = await res.json();
+            renderProducts(allProducts);
+            updateCartUI();
+        } catch (e) {
+            console.error("Failed to load products", e);
+        }
+    }
+
+    function renderProducts(products) {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = products.map(p => `
+            <div class="glass-card product-card">
+                <div class="product-image">
+                    <img src="${p.image}" alt="${p.name}">
+                    <span class="product-category">${p.category}</span>
+                </div>
+                <div class="product-info">
+                    <h3>${p.name}</h3>
+                    <p>${p.description}</p>
+                    <div class="product-footer">
+                        <span class="product-price">$${p.price}</span>
+                        <button class="btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterCategory(cat, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (cat === 'All') renderProducts(allProducts);
+        else renderProducts(allProducts.filter(p => p.category === cat));
+    }
+
+    function toggleCart() {
+        const sidebar = document.getElementById('cartSidebar');
+        const overlay = document.getElementById('cartOverlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }
+
+    document.getElementById('cartTrigger').onclick = toggleCart;
+    document.getElementById('cartOverlay').onclick = toggleCart;
+
+    function addToCart(id) {
+        const product = allProducts.find(p => p.id === id);
+        if (product) {
+            cart.push(product);
+            localStorage.setItem('mp_cart', JSON.stringify(cart));
+            updateCartUI();
+            if (typeof showToast === 'function') showToast(`Added ${product.name} to cart!`);
+            else alert(`Added ${product.name} to cart!`);
+        }
+    }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        localStorage.setItem('mp_cart', JSON.stringify(cart));
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        document.getElementById('cartCount').innerText = cart.length;
+        const total = cart.reduce((sum, p) => sum + p.price, 0);
+        document.getElementById('cartTotal').innerText = `$${total.toFixed(2)}`;
+        
+        const container = document.getElementById('cartItems');
+        if (cart.length === 0) {
+            container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:40px 0;">Cart is empty</div>`;
+        } else {
+            container.innerHTML = cart.map((p, idx) => `
+                <div class="cart-item">
+                    <img src="${p.image}" alt="${p.name}">
+                    <div style="flex:1">
+                        <div style="font-weight:700">${p.name}</div>
+                        <div style="color:var(--primary); font-size:0.9rem">$${p.price}</div>
+                    </div>
+                    <button class="btn-sm" style="background:#ef4444; border:none; padding:5px 10px; color:white;" onclick="removeFromCart(${idx})">✕</button>
+                </div>
+            `).join('');
+        }
+    }
+
+    function startCheckout() {
+        if (cart.length === 0) return alert("Cart is empty");
+        const total = cart.reduce((sum, p) => sum + p.price, 0);
+        document.getElementById('modalAmount').innerText = `$${total.toFixed(2)}`;
+        toggleCart(); // Close cart
+        document.getElementById('paymentModal').classList.add('open');
+    }
+
+    function closePayment() {
+        document.getElementById('paymentModal').classList.remove('open');
+    }
+
+    async function verifyManualPayment() {
+        const utr = document.getElementById('utrInput').value.trim();
+        if (!utr || utr.length < 6) return alert("Please enter a valid Transaction ID.");
+
+        try {
+            const res = await fetch('/api/verify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ razorpay_order_id: "qr_pay", razorpay_payment_id: utr })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("Order Placed Successfully! Admin will verify your payment shortly.");
+                cart = [];
+                localStorage.setItem('mp_cart', '[]');
+                updateCartUI();
+                closePayment();
+            }
+        } catch (e) {
+            alert("Verification failed. Please try again.");
+        }
+    }
+
+    loadProducts();
+</script>
+</body>
+</html>

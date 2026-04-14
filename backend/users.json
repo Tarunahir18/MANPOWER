@@ -1,7 +1,7 @@
 {
   "admin": {
     "password": "123",
-    "role": "admin"
+    "role": "user"
   },
   "23se02cs009@ppsu.ac.in": {
     "password": "123",
@@ -17,6 +17,60 @@
   },
   "test@ppsu.ac.in": {
     "password": "password123",
+    "role": "user"
+  },
+  "testuser@ppsu.ac.in": {
+    "password": "test123456",
+    "role": "user"
+  },
+  "23se02cs006@ppsu.ac.in": {
+    "password": "1234",
+    "role": "user"
+  },
+  "testuser@ppsu.com": {
+    "password": "Password123!",
+    "role": "user",
+    "enrolled": [
+      "General Sport"
+    ],
+    "activities": [
+      {
+        "action": "enrolled",
+        "game": "General Sport",
+        "timestamp": "2026-04-08T12:39:29.997Z"
+      }
+    ]
+  },
+  "23se02cs004@ppsu.ac.in": {
+    "password": "1234",
+    "role": "user",
+    "enrolled": [
+      "Chess"
+    ],
+    "activities": [
+      {
+        "action": "enrolled",
+        "game": "Chess",
+        "timestamp": "2026-04-11T06:12:29.355Z"
+      }
+    ]
+  },
+  "24se02it109@ppsu.ac.in": {
+    "password": "test123",
+    "role": "user",
+    "enrolled": [
+      "Chess"
+    ],
+    "activities": [
+      {
+        "action": "enrolled",
+        "game": "Chess",
+        "timestamp": "2026-04-11T15:59:17.937Z"
+      }
+    ]
+  },
+  "24se02ie012@ppsu.ac.in": {
+    "password": "1234",
     "role": "user"
   }
 }
