@@ -176,7 +176,17 @@ const ensureUIHelpers = () => {
 };
 
 const setupNavControls = () => {
-    // Nav controls are now handled by the HTML templates and styles.css
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuToggle && navLinks) {
+        // Prevent duplicate listeners if called multiple times or from inline scripts
+        const newToggle = menuToggle.cloneNode(true);
+        menuToggle.parentNode.replaceChild(newToggle, menuToggle);
+        newToggle.addEventListener('click', () => { 
+            navLinks.classList.toggle('expanded'); 
+            newToggle.textContent = navLinks.classList.contains('expanded') ? '✕' : '☰'; 
+        });
+    }
 };
 
 const addNotification = (text) => {

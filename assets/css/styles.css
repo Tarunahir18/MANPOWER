@@ -1873,8 +1873,9 @@ tbody tr:hover {
         top: 70px;
         right: 0;
         left: 0;
-        background: rgba(9, 20, 37, 0.97);
+        background: var(--bg-glass-strong);
         backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         flex-direction: column;
         padding: 16px;
         gap: 4px;
