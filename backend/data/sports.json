@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "name": "Football",
+    "description": "The world's most popular sport. Join our elite training program for all skill levels.",
+    "coach": "Marco Rossi",
+    "image": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80",
+    "schedule": "Mon, Wed, Fri - 4:00 PM to 6:00 PM",
+    "price": 49
+  },
+  {
+    "id": 2,
+    "name": "Basketball",
+    "description": "High-intensity training sessions focused on shooting, dribbling, and team strategy.",
+    "coach": "Sarah Jenkins",
+    "image": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80",
+    "schedule": "Tue, Thu - 5:00 PM to 7:00 PM",
+    "price": 39
+  },
+  {
+    "id": 3,
+    "name": "Cricket",
+    "description": "Master the art of batting, bowling and fielding with our professional coaches.",
+    "coach": "Rahul Dravid",
+    "image": "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=800&q=80",
+    "schedule": "Sat, Sun - 8:00 AM to 11:00 AM",
+    "price": 45
+  },
+  {
+    "id": 4,
+    "name": "Tennis",
+    "description": "Improve your game with personalized coaching on our premium courts.",
+    "coach": "Serena Williams",
+    "image": "https://images.unsplash.com/photo-1599586120429-48281b6f0ece?auto=format&fit=crop&w=800&q=80",
+    "schedule": "Mon to Fri - 7:00 AM to 9:00 AM",
+    "price": 55
+  },
+  {
+    "id": 5,
+    "name": "Chess",
+    "description": "Master the game of kings. Strategic training sessions for beginners to Grandmasters.",
+    "coach": "Magnus Carlsen",
+    "image": "https://images.unsplash.com/photo-1528819622765-d6bcf132f793?auto=format&fit=crop&w=800&q=80",
+    "schedule": "Tue, Thu, Sat - 6:00 PM to 8:00 PM",
+    "price": 30
+  }
+]

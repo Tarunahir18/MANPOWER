@@ -1,0 +1,58 @@
+[
+  {
+    "id": 101,
+    "name": "Elite Pro Jersey",
+    "category": "Jerseys",
+    "price": 590,
+    "image": "https://images.pexels.com/photos/10134017/pexels-photo-10134017.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "description": "Professional grade breathable fabric with moisture-wicking technology."
+  },
+  {
+    "id": 102,
+    "name": "MANPOWER Training Kit",
+    "category": "Jerseys",
+    "price": 89,
+    "image": "https://images.pexels.com/photos/1552252/pexels-photo-1552252.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "description": "Complete training set including jersey, shorts, and premium socks."
+  },
+  {
+    "id": 103,
+    "name": "Hyper-Grip Gloves",
+    "category": "Equipment",
+    "price": 35,
+    "image": "https://images.pexels.com/photos/4793235/pexels-photo-4793235.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "description": "Maximum control and comfort for goalkeepers and weightlifters."
+  },
+  {
+    "id": 104,
+    "name": "Iso-Gold Whey Protein",
+    "category": "Supplements",
+    "price": 45,
+    "image": "https://images.pexels.com/photos/6740822/pexels-photo-6740822.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "description": "Ultra-filtered premium whey protein for fast recovery."
+  },
+  {
+    "id": 105,
+    "name": "Smart Weight Ball",
+    "category": "Equipment",
+    "price": 120,
+    "image": "https://images.pexels.com/photos/358042/pexels-photo-358042.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "description": "Bluetooth enabled ball to track your shooting accuracy and power."
+  },
+  {
+    "id": 106,
+    "name": "Manpower Water Bottle",
+    "category": "Equipment",
+    "price": 15,
+    "image": "https://images.pexels.com/photos/1188647/pexels-photo-1188647.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "description": "Double-walled vacuum insulated bottle keeps drinks cold for 24h."
+  },
+  {
+    "id": 107,
+    "name": "International Grandmaster Chess Set",
+    "category": "Equipment",
+    "price": 149,
+    "image": "https://images.pexels.com/photos/1015568/pexels-photo-1015568.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "description": "Premium tournament-grade wooden chess set. FIDE standard weighted pieces with a mahogany and maple board."
+  }
+]
