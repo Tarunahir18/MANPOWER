@@ -175,7 +175,8 @@
         const isOutdoor = outdoorGames.includes(gLower);
         const isCombat = combatGames.includes(gLower);
         
-        const imgSrc = generateGameImage(gameName, isIndoor, isOutdoor, isCombat);
+        const svgSrc = generateGameImage(gameName, isIndoor, isOutdoor, isCombat);
+        const realImgSrc = `../assets/images/game_${gLower.replace(/[^a-z0-9]/g, '')}.jpg`;
 
         // Reset default li styles from styles.css since we are making it a card
         li.style.display = 'block';
@@ -187,8 +188,8 @@
         
         li.innerHTML = `
             <div class="tournament-card" style="height: 100%; display: flex; flex-direction: column;">
-                <div class="tournament-img" style="height: 160px;">
-                    <img src="${imgSrc}" alt="${gameName}">
+                <div class="tournament-img" style="height: 160px; overflow: hidden;">
+                    <img src="${realImgSrc}" alt="${gameName}" onerror="this.onerror=null; this.src='${svgSrc}'" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div class="tournament-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                     <h4 style="font-size: 18px;">${gameName}</h4>
@@ -215,7 +216,10 @@
         const showCombat = combatFilter.checked;
 
         gameListItems.forEach(li => {
-            const gameName = li.innerText.toLowerCase();
+            // Extract the game name accurately since li now contains nested elements
+            const h4 = li.querySelector('h4');
+            const gameName = (h4 ? h4.innerText : li.innerText).toLowerCase().trim();
+            
             const matchesSearch = gameName.includes(query);
 
             const indoorGames = ['badminton', 'table tennis', 'chess', 'basketball', 'volleyball', 'handball', 'kabaddi', 'soft tennis', 'lawn tennis', 'squash', 'swimming', 'gymnastics', 'weight lifting', 'yogasan'];

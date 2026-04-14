@@ -43,6 +43,34 @@ const products = [
         price: 32.50,
         image: 'https://images.unsplash.com/photo-1610725664285-f9af34c6786e?q=80&w=800&auto=format&fit=crop',
         description: 'Essential amino acids for endurance and reduced muscle soreness.'
+    },
+    {
+        name: 'MANPOWER Premium Gym Bag',
+        category: 'Accessories',
+        price: 40.00,
+        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop',
+        description: 'Spacious and durable duffel bag with waterproof compartments and breathable shoe pocket.'
+    },
+    {
+        name: 'Pro-Grip Basketball',
+        category: 'Equipment',
+        price: 35.00,
+        image: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=800&auto=format&fit=crop',
+        description: 'Indoor/outdoor multi-surface basketball with advanced composite leather grip.'
+    },
+    {
+        name: 'Elite Training Resistance Bands',
+        category: 'Equipment',
+        price: 24.99,
+        image: 'https://images.unsplash.com/photo-1598289431512-b97b0a150b18?q=80&w=800&auto=format&fit=crop',
+        description: 'Set of 5 heavy-duty latex resistance bands ranging from 10lbs to 50lbs, including handles.'
+    },
+    {
+        name: 'HydraFlask 32oz Insulated Bottle',
+        category: 'Accessories',
+        price: 28.50,
+        image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=800&auto=format&fit=crop',
+        description: 'Double-wall vacuum insulated stainless steel water bottle. Keeps drinks cold for 24 hours.'
     }
 ];
 

@@ -63,13 +63,21 @@
     document.title = gameName + " – MANPOWER";
 
     const imgEl = document.getElementById('sportImage');
-    const normalizedGame = gameName.trim().toLowerCase();
+    const normalizedGame = gameName.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    // First, try loading the specific game image
     if (normalizedGame === 'chess') {
         imgEl.src = '../assets/images/chess.jpg';
         imgEl.alt = 'Chess Player';
     } else {
-        imgEl.src = '../assets/images/stadium.png';
+        imgEl.src = `../assets/images/game_${normalizedGame}.jpg`;
         imgEl.alt = gameName + ' Image';
+        
+        // Fallback to stadium.png if specific image not found
+        imgEl.onerror = () => {
+            imgEl.onerror = null;
+            imgEl.src = '../assets/images/stadium.png';
+        };
     }
 
     const localToast = (msg, error=false) => {
