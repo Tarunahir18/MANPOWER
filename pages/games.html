@@ -127,13 +127,75 @@
         setTimeout(() => toastDiv.style.display = "none", 3000);
     }
 
-    // Enhance list with Enroll buttons
+    // Convert the UL to a Grid
+    const gameListUl = document.getElementById('gameList');
+    gameListUl.style.display = 'grid';
+    gameListUl.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+    gameListUl.style.gap = '20px';
+    gameListUl.style.padding = '0';
+    gameListUl.style.listStyle = 'none';
+
+    function generateGameImage(name, isIndoor, isOutdoor, isCombat) {
+        let category = 'General';
+        let primary = '#1E88E5'; // Blue
+        if (isCombat) { category = 'Combat'; primary = '#D32F2F'; }
+        else if (isIndoor) { category = 'Indoor'; primary = '#E8680F'; }
+        else if (isOutdoor) { category = 'Outdoor'; primary = '#00897B'; }
+
+        const bg = '#091425';
+        
+        const svg = `
+        <svg width="400" height="250" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="${bg}"/>
+            <defs>
+                <linearGradient id="g_${name.replace(/[^a-zA-Z]/g,'')}" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:${primary};stop-opacity:0.8" />
+                    <stop offset="100%" style="stop-color:${bg};stop-opacity:0" />
+                </linearGradient>
+            </defs>
+            <rect width="400" height="250" fill="url(#g_${name.replace(/[^a-zA-Z]/g,'')})"/>
+            <text x="20" y="235" fill="${primary}" font-family="Outfit, sans-serif" font-weight="900" font-size="70" opacity="0.1" style="text-transform:uppercase;">${category}</text>
+            <text x="50%" y="45%" text-anchor="middle" fill="white" font-family="Outfit, sans-serif" font-weight="400" font-size="12" letter-spacing="4" style="text-transform:uppercase;opacity:0.75;">MANPOWER PRO</text>
+            <text x="50%" y="60%" text-anchor="middle" fill="white" font-family="Outfit, sans-serif" font-weight="800" font-size="28">${name.toUpperCase()}</text>
+        </svg>`;
+        
+        return `data:image/svg+xml;base64,${btoa(svg)}`;
+    }
+
+    const indoorGames = ['badminton', 'table tennis', 'chess', 'basketball', 'volleyball', 'handball', 'kabaddi', 'soft tennis', 'lawn tennis', 'squash', 'swimming', 'gymnastics', 'weight lifting', 'yogasan'];
+    const outdoorGames = ['football', 'athletics', 'cycling', 'archery', 'shooting ball', 'roll ball', 'basketball', 'volleyball', 'handball', 'kabaddi', 'hockey', 'cricket', 'baseball', 'rugby', 'wrestling', 'boxing', 'judo', 'karate', 'taekwondo', 'fencing'];
+    const combatGames = ['boxing', 'judo', 'karate', 'taekwondo', 'fencing', 'wrestling', 'malkham'];
+
+    // Enhance list with Cards and Enroll buttons
     gameListItems.forEach(li => {
         const gameName = li.innerText.trim();
+        const gLower = gameName.toLowerCase();
+        
+        const isIndoor = indoorGames.includes(gLower);
+        const isOutdoor = outdoorGames.includes(gLower);
+        const isCombat = combatGames.includes(gLower);
+        
+        const imgSrc = generateGameImage(gameName, isIndoor, isOutdoor, isCombat);
+
+        // Reset default li styles from styles.css since we are making it a card
+        li.style.display = 'block';
+        li.style.padding = '0';
+        li.style.margin = '0';
+        li.style.background = 'transparent';
+        li.style.border = 'none';
         li.style.cursor = 'pointer';
+        
         li.innerHTML = `
-            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">${gameName}</span>
-            <span class="enroll-btn">View Info & Enroll →</span>
+            <div class="tournament-card" style="height: 100%; display: flex; flex-direction: column;">
+                <div class="tournament-img" style="height: 160px;">
+                    <img src="${imgSrc}" alt="${gameName}">
+                </div>
+                <div class="tournament-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <h4 style="font-size: 18px;">${gameName}</h4>
+                    <p style="margin-bottom: 16px;">Click to view info and register.</p>
+                    <button class="enroll-btn" style="width: 100%;">Enroll Now →</button>
+                </div>
+            </div>
         `;
         li.onclick = () => {
             window.location.assign("sport.html?game=" + encodeURIComponent(gameName));
@@ -169,24 +231,16 @@
                                   (showOutdoor && isOutdoor) || 
                                   (showCombat && isCombat);
 
-            li.style.display = matchesSearch && matchesFilter ? 'flex' : 'none';
+            li.style.display = matchesSearch && matchesFilter ? 'block' : 'none';
         });
     }
-
-    searchBox.addEventListener('keyup', () => {
-        const filter = searchBox.value.toLowerCase();
-        gameListItems.forEach(li => {
-            const text = li.querySelector('span').innerText.toLowerCase();
-            li.style.display = text.includes(filter) ? "flex" : "none";
-        });
-    });
 
     searchBox.addEventListener('keypress', (e) => {
         if(e.key === 'Enter') {
             const visible = Array.from(gameListItems).filter(li => li.style.display !== 'none');
             if(visible.length === 1) {
-                const gameName = visible[0].querySelector('span').innerText;
-                handleEnroll(gameName);
+                const gameName = visible[0].querySelector('h4').innerText;
+                window.location.assign("sport.html?game=" + encodeURIComponent(gameName));
             }
         }
     });
