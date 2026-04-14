@@ -29,32 +29,36 @@ const createApiCandidates = () => {
 async function detectApiUrl() {
     if (window.__API_URL__) return window.__API_URL__;
 
-    for (const base of createApiCandidates()) {
+    console.log('[API] Detecting backend...');
+    const candidates = createApiCandidates();
+    
+    // Attempt to find the working backend in parallel for speed
+    const probe = async (base) => {
         try {
-            // Add a timeout to the fetch call
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1200);
-
+            const timeoutId = setTimeout(() => controller.abort(), 1500);
             const response = await fetch(`${base}/health`, { 
                 method: 'GET',
                 signal: controller.signal 
             });
-            
             clearTimeout(timeoutId);
+            if (response.ok) return base;
+        } catch (e) { /* ignore */ }
+        return null;
+    };
 
-            if (response.ok) {
-                window.__API_URL__ = base;
-                console.log('[API_URL]', base);
-                return base;
-            }
-        } catch (error) {
-            // try next candidate
-        }
+    const results = await Promise.all(candidates.map(probe));
+    const workingBase = results.find(r => r !== null);
+
+    if (workingBase) {
+        window.__API_URL__ = workingBase;
+        console.log('[API] Found at:', workingBase);
+        return workingBase;
     }
 
     const fallback = 'http://localhost:3000/api/v1';
     window.__API_URL__ = fallback;
-    console.warn('[API_URL fallback]', fallback);
+    console.warn('[API] None found, falling back to:', fallback);
     return fallback;
 }
 
@@ -82,9 +86,17 @@ const apiRequest = async (path, options = {}) => {
     let response;
 
     try {
-        response = await fetch(`${apiBase}${path}`, { ...options, headers });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s total request timeout
+
+        response = await fetch(`${apiBase}${path}`, { 
+            ...options, 
+            headers,
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
     } catch (fetchError) {
-        const error = new Error(fetchError.message || 'Network request failed');
+        const error = new Error(fetchError.name === 'AbortError' ? 'Server connection timed out' : (fetchError.message || 'Network request failed'));
         error.isNetworkError = true;
         throw error;
     }
