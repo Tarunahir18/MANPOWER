@@ -421,7 +421,7 @@
             return `
             <div class="glass-card product-card" style="animation: fadeIn 0.5s ease forwards;">
                 <div class="product-image">
-                    <img src="${imgSrc}" alt="${p.name}" onerror="this.src=generateTextLogo('${p.name}', '${p.category}')">
+                    <img src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.src=generateTextLogo('${p.name}', '${p.category}')">
                     <span class="product-category">${p.category}</span>
                 </div>
                 <div class="product-info">

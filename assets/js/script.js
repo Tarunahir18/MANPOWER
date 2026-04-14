@@ -32,37 +32,51 @@ const createApiCandidates = () => {
 async function detectApiUrl() {
     if (window.__API_URL__) return window.__API_URL__;
 
+    // 1. Check Caching (Huge speedup)
+    const cached = localStorage.getItem('__STORED_API_URL__');
+    if (cached) {
+        window.__API_URL__ = cached;
+        // Verify in background to keep it fresh, but return immediately
+        fetch(`${cached}/health`).then(res => {
+            if (!res.ok) localStorage.removeItem('__STORED_API_URL__');
+        }).catch(() => localStorage.removeItem('__STORED_API_URL__'));
+        return cached;
+    }
+
     console.log('[API] Detecting backend...');
     const candidates = createApiCandidates();
     
-    // Attempt to find the working backend in parallel for speed
-    const probe = async (base) => {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1500);
-            const response = await fetch(`${base}/health`, { 
-                method: 'GET',
-                signal: controller.signal 
-            });
-            clearTimeout(timeoutId);
-            if (response.ok) return base;
-        } catch (e) { /* ignore */ }
-        return null;
-    };
+    // 2. Faster Probing logic
+    return new Promise((resolve) => {
+        let resolved = false;
+        const fallback = 'http://localhost:3000/api/v1';
+        
+        const timeoutId = setTimeout(() => {
+            if (!resolved) {
+                resolved = true;
+                window.__API_URL__ = fallback;
+                resolve(fallback);
+            }
+        }, 1500);
 
-    const results = await Promise.all(candidates.map(probe));
-    const workingBase = results.find(r => r !== null);
-
-    if (workingBase) {
-        window.__API_URL__ = workingBase;
-        console.log('[API] Found at:', workingBase);
-        return workingBase;
-    }
-
-    const fallback = 'http://localhost:3000/api/v1';
-    window.__API_URL__ = fallback;
-    console.warn('[API] None found, falling back to:', fallback);
-    return fallback;
+        candidates.forEach(async (base) => {
+            try {
+                const controller = new AbortController();
+                const nodeTimeout = setTimeout(() => controller.abort(), 1000);
+                const response = await fetch(`${base}/health`, { signal: controller.signal });
+                clearTimeout(nodeTimeout);
+                
+                if (response.ok && !resolved) {
+                    resolved = true;
+                    clearTimeout(timeoutId);
+                    window.__API_URL__ = base;
+                    localStorage.setItem('__STORED_API_URL__', base);
+                    console.log('[API] Found at:', base);
+                    resolve(base);
+                }
+            } catch (e) { /* silent fail */ }
+        });
+    });
 }
 
 window.getApiUrl = detectApiUrl;
@@ -786,10 +800,9 @@ if (logoutBtn) {
 }
 
 /* -------- AUTO CHECK -------- */
-window.onload = () => {
+const initApp = () => {
     if (loader) loader.style.display = "none";
     
-    // Page Identification
     const path = window.location.pathname;
     const isLoginPage = path.endsWith('index.html') || path.endsWith('/') || !path.includes('.html');
     const isHomePage = path.endsWith('/index.html');
@@ -809,7 +822,24 @@ window.onload = () => {
     initGlobalUI();
     initializeRoleBasedMenu();
     loadTheme();
+
+    // Register Service Worker for Offline Caching & Speed
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('[PWA] Service Worker Registered'))
+            .catch(err => console.warn('[PWA] SW Registration Failed:', err));
+    }
 };
+
+// Faster loading: don't wait for images
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+
+// Fallback to hide loader if everything else fails
+setTimeout(() => { if(loader) loader.style.display="none"; }, 3000);
 
 /* -------- INITIALIZE ROLE-BASED MENU -------- */
 function initializeRoleBasedMenu() {
