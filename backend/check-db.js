@@ -1,3 +1,4 @@
+require('dotenv').config();
 const supabase = require('./supabase');
 
 async function check() {

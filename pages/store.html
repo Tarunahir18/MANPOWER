@@ -6,6 +6,7 @@
     <title>Store – MANPOWER Sports</title>
     <meta name="description" content="Shop premium sports gear, jerseys, and equipment at the MANPOWER Store.">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         .store-grid {
             display: grid;
@@ -321,14 +322,74 @@
     </div>
 </div>
 
+
+<!-- Cart Sidebar -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h2>Your Cart 🛒</h2>
+        <button class="btn-sm" onclick="toggleCart()" style="background:none; border:none; font-size:1.5rem; color:var(--text-muted);">✕</button>
+    </div>
+    
+    <div class="cart-items" id="cartItems">
+        <!-- Cart Items injected here -->
+    </div>
+
+    <div class="cart-footer">
+        <div class="cart-total">
+            <span>Total:</span>
+            <span id="cartTotal">$0.00</span>
+        </div>
+        <button class="btn-primary" style="width:100%;" onclick="startCheckout()">Proceed to Checkout →</button>
+    </div>
+</div>
+
 <script src="../assets/js/script.js"></script>
 <script>
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('mp_cart') || '[]');
 
+    function generateTextLogo(name, category) {
+        const colors = {
+            'Jerseys': ['#E8680F', '#091425'],
+            'Equipment': ['#00897B', '#091425'],
+            'Supplements': ['#1E88E5', '#091425'],
+            'Other': ['#64748b', '#091425']
+        };
+        const [primary, bg] = colors[category] || colors['Other'];
+        
+        // Premium SVG with gradients and modern typography
+        const svg = `
+        <svg width="600" height="500" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
+            <rect width="600" height="500" fill="${bg}"/>
+            <defs>
+                <linearGradient id="g_${name.replace(/\s/g,'')}" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:${primary};stop-opacity:0.6" />
+                    <stop offset="100%" style="stop-color:${bg};stop-opacity:0" />
+                </linearGradient>
+            </defs>
+            <rect width="600" height="500" fill="url(#g_${name.replace(/\s/g,'')})"/>
+            <text x="50" y="440" fill="${primary}" font-family="Outfit, sans-serif" font-weight="900" font-size="80" opacity="0.1" style="text-transform:uppercase;">${category}</text>
+            <text x="50%" y="45%" text-anchor="middle" fill="white" font-family="Outfit, sans-serif" font-weight="400" font-size="14" letter-spacing="4" style="text-transform:uppercase;opacity:0.7;">MANPOWER PREMIUM</text>
+            <text x="50%" y="55%" text-anchor="middle" fill="white" font-family="Outfit, sans-serif" font-weight="800" font-size="32">${name.toUpperCase()}</text>
+            <line x1="250" y1="300" x2="350" y2="300" stroke="${primary}" stroke-width="3" />
+        </svg>`;
+        
+        return `data:image/svg+xml;base64,${btoa(svg)}`;
+    }
+
     async function loadProducts() {
         try {
             allProducts = await apiRequest('/products');
+            
+            // Generate text-based images if they don't have a valid URL
+            allProducts = allProducts.map(p => {
+                if (!p.image || p.image === 'text') {
+                    p.image = generateTextLogo(p.name, p.category);
+                }
+                return p;
+            });
+
             renderProducts(allProducts);
             updateCartUI();
         } catch (e) {
@@ -355,10 +416,12 @@
 
     function renderProducts(products) {
         const grid = document.getElementById('productGrid');
-        grid.innerHTML = products.map(p => `
-            <div class="glass-card product-card">
+        grid.innerHTML = products.map(p => {
+            const imgSrc = (p.image && p.image !== 'text') ? p.image : generateTextLogo(p.name, p.category);
+            return `
+            <div class="glass-card product-card" style="animation: fadeIn 0.5s ease forwards;">
                 <div class="product-image">
-                    <img src="${p.image}" alt="${p.name}">
+                    <img src="${imgSrc}" alt="${p.name}" onerror="this.src=generateTextLogo('${p.name}', '${p.category}')">
                     <span class="product-category">${p.category}</span>
                 </div>
                 <div class="product-info">
@@ -369,8 +432,8 @@
                         <button class="btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
     }
 
     function filterCategory(cat, btn) {

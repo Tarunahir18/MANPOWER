@@ -6,7 +6,7 @@ const products = [
         name: 'MANPOWER Elite Jersey',
         category: 'Jerseys',
         price: 45.99,
-        image: 'https://images.unsplash.com/photo-1580087444694-ec69fac42eeb?q=80&w=800&auto=format&fit=crop',
+        image: '../assets/images/elite_jersey.png',
         description: 'Official MANPOWER team jersey with breathable fabric and moisture-wicking technology.'
     },
     {

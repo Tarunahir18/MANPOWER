@@ -802,6 +802,8 @@ window.onload = () => {
     const userStr = localStorage.getItem("user");
     if (userStr && (isHomePage || isDashPage || isLoginPage)) {
         showHome(); 
+    } else if (isLoginPage) {
+        showLogin();
     }
 
     initGlobalUI();
