@@ -1,11 +1,14 @@
-/* -------- UTILITIES -------- */
-function toast(msg) {
+function toasty(msg, type = 'success') {
     const t = document.getElementById("toast");
     if (!t) return;
     t.innerText = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
+    t.className = `toast show ${type}`;
+    setTimeout(() => {
+        t.classList.remove("show");
+        t.classList.remove(type);
+    }, 3000);
 }
+window.showToast = toasty; // Legacy support
 
 /* -------- API URL -------- */
 const createApiCandidates = () => {
@@ -83,19 +86,22 @@ const apiRequest = async (path, options = {}) => {
     }
 
     const apiBase = await detectApiUrl();
+    const url = `${apiBase}${path}`;
+    console.log(`[API] Requesting: ${url}`, options);
     let response;
 
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s total request timeout
 
-        response = await fetch(`${apiBase}${path}`, { 
+        response = await fetch(url, { 
             ...options, 
             headers,
             signal: controller.signal
         });
         clearTimeout(timeoutId);
     } catch (fetchError) {
+        console.error(`[API] Fetch Error for ${url}:`, fetchError);
         const error = new Error(fetchError.name === 'AbortError' ? 'Server connection timed out' : (fetchError.message || 'Network request failed'));
         error.isNetworkError = true;
         throw error;
@@ -119,14 +125,7 @@ const apiRequest = async (path, options = {}) => {
     return data;
 };
 
-const toasty = (message, type = 'success') => {
-    const toastEl = document.getElementById('toast');
-    if (!toastEl) return;
-    toastEl.innerText = message;
-    toastEl.className = `show ${type}`;
-    clearTimeout(toasty._timer);
-    toasty._timer = setTimeout(() => toastEl.classList.remove('show'), 3500);
-};
+// toasty function is already declared at the top as a function declaration.
 
 const validEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const validPassword = (password) => typeof password === 'string' && password.length >= 4;
@@ -292,8 +291,28 @@ const userTypeBtn = document.getElementById("userTypeBtn");
 const adminTypeBtn = document.getElementById("adminTypeBtn");
 const loginTitle = document.getElementById("loginTitle");
 const modeNote = document.getElementById("modeNote");
-const welcomeText = document.getElementById("welcomeText");
 const logoutBtn = document.getElementById("logoutBtn");
+
+function showHome() {
+    if (loader) loader.style.display = "none";
+    if (loginPage) loginPage.style.display = "none";
+    if (homePage) homePage.style.display = "block";
+    updateWelcomeText();
+}
+
+function showLogin() {
+    if (loader) loader.style.display = "none";
+    if (loginPage) loginPage.style.display = "block";
+    if (homePage) homePage.style.display = "none";
+}
+
+function updateWelcomeText() {
+    const user = getCurrentUser();
+    const welcome = document.getElementById("welcomeText");
+    if (welcome && user) {
+        welcome.innerText = user.email === "Admin" ? "Welcome, Admin" : `Hello, ${user.email}`;
+    }
+}
 
 let isLogin = true;
 let loginMode = "user";
@@ -381,7 +400,11 @@ async function handleAuth() {
     const role = loginMode;
 
     try {
-        msg.innerText = "Connecting...";
+        msg.innerText = "⏳ Connecting to server...";
+        msg.style.color = "var(--primary)";
+        msg.style.background = "var(--primary-glow)";
+        msg.style.borderColor = "var(--primary-border)";
+        msg.style.display = "block";
         
         let data;
         let backendFailed = false;
@@ -432,20 +455,30 @@ async function handleAuth() {
         
         let _dbClient = null;
         if (window.supabase) {
-            _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            try {
+                _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } catch (supaError) {
+                console.error("[SUPABASE] Client init failed:", supaError);
+            }
         }
         
         if (!_dbClient) {
-            msg.innerText = "Connection failed. Please ensure the backend server is running.";
+            msg.innerText = "❌ Connection failed. Please ensure the backend server is running.";
+            msg.style.color = "var(--danger)";
+            msg.style.background = "rgba(211, 47, 47, 0.08)";
+            msg.style.borderColor = "rgba(211, 47, 47, 0.15)";
             return;
         }
+
+        msg.innerText = "⏳ Server busy, using direct DB sync...";
 
         if (role === "admin" && isLogin) {
             if (email === "admin" && password === "1234") {
                 localStorage.setItem("user", JSON.stringify({ email: "Admin", role: "admin", enrolled: [], activities: [] }));
                 showHome();
             } else {
-                msg.innerText = "Invalid admin credentials";
+                msg.innerText = "❌ Invalid admin credentials";
+                msg.style.color = "var(--danger)";
             }
             return;
         }
@@ -453,7 +486,8 @@ async function handleAuth() {
         if (isLogin) {
             const { data: user, error: dbError } = await _dbClient.from('users').select('*').eq('email', email).single();
             if (dbError || !user || user.password !== password) {
-                msg.innerText = "Invalid login credentials";
+                msg.innerText = "❌ Invalid login credentials";
+                msg.style.color = "var(--danger)";
                 return;
             }
             localStorage.setItem("user", JSON.stringify({ email: user.email, role: user.role, enrolled: [], activities: [] }));
@@ -461,12 +495,14 @@ async function handleAuth() {
         } else {
             const { data: existing } = await _dbClient.from('users').select('email').eq('email', email).single();
             if (existing) {
-                msg.innerText = "User already exists";
+                msg.innerText = "❌ User already exists";
+                msg.style.color = "var(--danger)";
                 return;
             }
             const { error: insertError } = await _dbClient.from('users').insert([{ email, password, role: role || 'user' }]);
             if (insertError) {
-                msg.innerText = insertError.message || "Signup failed in database";
+                msg.innerText = "❌ " + (insertError.message || "Signup failed in database");
+                msg.style.color = "var(--danger)";
                 return;
             }
             toasty("Signup successful! Please login.");
@@ -475,7 +511,8 @@ async function handleAuth() {
         }
     } catch (error) {
         console.error(error);
-        msg.innerText = "An unexpected error occurred during authentication.";
+        msg.innerText = "❌ An unexpected error occurred.";
+        msg.style.color = "var(--danger)";
     }
 }
 

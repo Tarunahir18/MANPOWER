@@ -127,10 +127,12 @@
 
     async function loadProducts() {
         try {
-            const res = await fetch('/api/products');
-            products = await res.json();
+            products = await apiRequest('/products');
             renderTable();
-        } catch (e) { console.error(e); }
+        } catch (e) { 
+            console.error(e);
+            toasty("Failed to load products", "error");
+        }
     }
 
     function renderTable() {
@@ -182,7 +184,7 @@
 
         try {
             const method = id ? 'PATCH' : 'POST';
-            const url = id ? `/api/products/${id}` : '/api/products';
+            const url = id ? `/products/${id}` : '/products';
             const res = await apiRequest(url, {
                 method,
                 body: JSON.stringify(payload)
@@ -198,7 +200,7 @@
     async function deleteProduct(id) {
         if (!confirm('Delete this product?')) return;
         try {
-            const res = await apiRequest(`/api/products/${id}`, { method: 'DELETE' });
+            const res = await apiRequest(`/products/${id}`, { method: 'DELETE' });
             if (res.success) { toasty('Product deleted'); loadProducts(); }
         } catch (err) { toasty(err.message, 'error'); }
     }

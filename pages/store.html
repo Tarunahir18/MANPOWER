@@ -332,8 +332,24 @@
             renderProducts(allProducts);
             updateCartUI();
         } catch (e) {
-            console.error("Failed to load products", e);
-            toasty("Failed to load products from server", "error");
+            console.error("API failed, trying direct DB fallback...", e);
+            
+            // Fallback to Supabase directly
+            const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+            
+            if (window.supabase) {
+                const _db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                const { data, error } = await _db.from('products').select('*').order('id', { ascending: true });
+                if (!error && data) {
+                    allProducts = data;
+                    renderProducts(allProducts);
+                    updateCartUI();
+                    return;
+                }
+            }
+            
+            toasty("Failed to load products from any source", "error");
         }
     }
 

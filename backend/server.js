@@ -564,7 +564,7 @@ app.delete('/api/v1/tournaments/:id', requireAdmin, async (req, res) => {
    STORE / PRODUCTS
    ====================================================== */
 
-app.get('/api/products', async (req, res) => {
+app.get('/api/v1/products', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('products')
@@ -583,7 +583,7 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-app.post('/api/products', requireAdmin, async (req, res) => {
+app.post('/api/v1/products', requireAdmin, async (req, res) => {
     const { name, category, price, image, description } = req.body;
     if (!name || !category || !price) {
         return res.status(400).json({ success: false, message: 'Name, category and price are required' });
@@ -602,7 +602,7 @@ app.post('/api/products', requireAdmin, async (req, res) => {
     }
 });
 
-app.patch('/api/products/:id', requireAdmin, async (req, res) => {
+app.patch('/api/v1/products/:id', requireAdmin, async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
     if (updates.price) updates.price = Number(updates.price);
@@ -621,7 +621,7 @@ app.patch('/api/products/:id', requireAdmin, async (req, res) => {
     }
 });
 
-app.delete('/api/products/:id', requireAdmin, async (req, res) => {
+app.delete('/api/v1/products/:id', requireAdmin, async (req, res) => {
     const { id } = req.params;
     try {
         const { error } = await supabase
