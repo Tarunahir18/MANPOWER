@@ -16,7 +16,7 @@ const createApiCandidates = () => {
     const ports = ['3000', '8080', '5000', '5500'];
     const candidates = [];
 
-    if (protocol !== 'file:' && currentPort && !['80', '443'].includes(currentPort)) {
+    if (protocol !== 'file:') {
         candidates.push(`${origin}/api/v1`);
     }
 
@@ -67,12 +67,33 @@ const apiRequest = async (path, options = {}) => {
     if (user?.role) {
         headers['x-user-role'] = user.role;
     }
+
     const apiBase = await detectApiUrl();
-    const response = await fetch(`${apiBase}${path}`, { ...options, headers });
-    const data = await response.json().catch(() => ({ success: false, message: 'Invalid response from server' }));
-    if (!response.ok) {
-        throw new Error(data.message || response.statusText || 'Request failed');
+    let response;
+
+    try {
+        response = await fetch(`${apiBase}${path}`, { ...options, headers });
+    } catch (fetchError) {
+        const error = new Error(fetchError.message || 'Network request failed');
+        error.isNetworkError = true;
+        throw error;
     }
+
+    const text = await response.text().catch(() => '');
+    let data = { success: false, message: text || 'Invalid response from server' };
+    try {
+        data = JSON.parse(text);
+    } catch {
+        // keep text fallback message
+    }
+
+    if (!response.ok) {
+        const error = new Error(data.message || response.statusText || 'Request failed');
+        error.status = response.status;
+        error.data = data;
+        throw error;
+    }
+
     return data;
 };
 
@@ -342,72 +363,87 @@ async function handleAuth() {
         
         let data;
         let backendFailed = false;
-        
+        let backendErrorMessage = '';
+        const apiBase = await detectApiUrl();
+
         try {
             data = await apiRequest(`/users/${endpoint}`, {
                 method: "POST",
                 body: JSON.stringify({ email, password, role })
             });
         } catch (backendError) {
-            console.warn("[AUTH] Backend not reachable, falling back to direct DB connection.", backendError);
-            backendFailed = true;
+            if (backendError.isNetworkError) {
+                console.warn("[AUTH] Backend not reachable, falling back to direct DB connection.", backendError);
+                backendFailed = true;
+            } else {
+                backendErrorMessage = backendError.message || "Login failed.";
+            }
         }
 
-        if (!backendFailed && data) {
-            if (data.success) {
-                if (isLogin) {
-                    localStorage.setItem("user", JSON.stringify({ email, role: data.role || role, enrolled: [], activities: [] }));
-                    showHome();
-                } else {
-                    toasty("Signup successful! Please login.");
-                    isLogin = true;
-                    updateLoginUi();
-                }
-            } else {
-                msg.innerText = data.message || "Login failed.";
-            }
-        } else {
-            // DIRECT DATABASE FALLBACK
-            const _dbClient = window.supabase ? window.supabase.createClient('https://merpbfceascuopcgqwiw.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro') : null;
-            
-            if (!_dbClient) {
-                msg.innerText = "Cannot connect to the server or database. Please run the backend.";
+        if (!backendFailed) {
+            if (backendErrorMessage) {
+                msg.innerText = backendErrorMessage;
                 return;
             }
 
-            if (role === "admin" && isLogin) {
-                if (email === "admin" && password === "1234") {
-                    localStorage.setItem("user", JSON.stringify({ email: "Admin", role: "admin", enrolled: [], activities: [] }));
-                    showHome();
-                } else {
-                    msg.innerText = "Invalid admin credentials";
-                }
-                return;
-            }
-
-            if (isLogin) {
-                const { data: user, error: dbError } = await _dbClient.from('users').select('*').eq('email', email).single();
-                if (dbError || !user || user.password !== password) {
-                    msg.innerText = "Invalid login credentials";
+            if (data) {
+                if (data.success) {
+                    if (isLogin) {
+                        localStorage.setItem("user", JSON.stringify({ email, role: data.role || role, enrolled: [], activities: [] }));
+                        showHome();
+                    } else {
+                        toasty("Signup successful! Please login.");
+                        isLogin = true;
+                        updateLoginUi();
+                    }
                     return;
                 }
-                localStorage.setItem("user", JSON.stringify({ email: user.email, role: user.role, enrolled: [], activities: [] }));
+
+                msg.innerText = data.message || "Login failed.";
+                return;
+            }
+        }
+
+        // DIRECT DATABASE FALLBACK
+        const _dbClient = window.supabase ? window.supabase.createClient('https://merpbfceascuopcgqwiw.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro') : null;
+        
+        if (!_dbClient) {
+            msg.innerText = "Cannot connect to the server or database. Please run the backend.";
+            return;
+        }
+
+        if (role === "admin" && isLogin) {
+            if (email === "admin" && password === "1234") {
+                localStorage.setItem("user", JSON.stringify({ email: "Admin", role: "admin", enrolled: [], activities: [] }));
                 showHome();
             } else {
-                const { data: existing } = await _dbClient.from('users').select('email').eq('email', email).single();
-                if (existing) {
-                    msg.innerText = "User already exists";
-                    return;
-                }
-                const { error: insertError } = await _dbClient.from('users').insert([{ email, password, role: role || 'user' }]);
-                if (insertError) {
-                    msg.innerText = insertError.message || "Signup failed in database";
-                    return;
-                }
-                toasty("Signup successful! Please login.");
-                isLogin = true;
-                updateLoginUi();
+                msg.innerText = "Invalid admin credentials";
             }
+            return;
+        }
+
+        if (isLogin) {
+            const { data: user, error: dbError } = await _dbClient.from('users').select('*').eq('email', email).single();
+            if (dbError || !user || user.password !== password) {
+                msg.innerText = "Invalid login credentials";
+                return;
+            }
+            localStorage.setItem("user", JSON.stringify({ email: user.email, role: user.role, enrolled: [], activities: [] }));
+            showHome();
+        } else {
+            const { data: existing } = await _dbClient.from('users').select('email').eq('email', email).single();
+            if (existing) {
+                msg.innerText = "User already exists";
+                return;
+            }
+            const { error: insertError } = await _dbClient.from('users').insert([{ email, password, role: role || 'user' }]);
+            if (insertError) {
+                msg.innerText = insertError.message || "Signup failed in database";
+                return;
+            }
+            toasty("Signup successful! Please login.");
+            isLogin = true;
+            updateLoginUi();
         }
     } catch (error) {
         console.error(error);
