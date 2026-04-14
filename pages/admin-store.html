@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Management – MANPOWER Admin</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+        .admin-table th { background: var(--bg-card); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
+        .product-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+            background: var(--bg-card); width: 100%; max-width: 500px; padding: 30px;
+            border-radius: 20px; border: 1px solid var(--border-default);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-default);
+            background: var(--bg-input); color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../index.html" class="nav-brand">
+        <img src="../assets/images/manpower-logo.png" alt="MANPOWER">
+        <div>
+            <span class="nav-brand-text">MANPOWER</span>
+            <span class="nav-brand-sub">Admin Panel</span>
+        </div>
+    </a>
+    <div class="nav-links" id="navLinks">
+        <a href="admin-dashboard.html">📈 Dashboard</a>
+        <a href="admin-users.html">👥 Users</a>
+        <a href="admin-store.html" class="active">🛒 Store Mgmt</a>
+        <a href="contact.html">✉️ Messages</a>
+        <a href="#" id="logoutBtn" class="nav-logout">🚪 Logout</a>
+    </div>
+</nav>
+
+<div class="page-container-wide">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+            <h1>🛒 Store <span style="color:var(--primary);">Management</span></h1>
+            <p>Add, edit or remove products from the public store</p>
+        </div>
+        <button class="btn-primary" onclick="openModal()">+ Add New Product</button>
+    </div>
+
+    <div class="glass-card" style="margin-top: 30px;">
+        <div style="overflow-x:auto;">
+            <table class="admin-table" id="productTable">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productBody">
+                    <!-- Products injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal" id="productModal">
+    <div class="modal-content">
+        <h2 id="modalTitle" style="margin-bottom:20px;">Add New Product</h2>
+        <form id="productForm" onsubmit="saveProduct(event)">
+            <input type="hidden" id="pid">
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="pname" required placeholder="e.g. Elite Jersey">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="pcat" required>
+                    <option value="Jerseys">Jerseys</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Supplements">Supplements</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Price ($)</label>
+                <input type="number" step="0.01" id="pprice" required placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Image URL</label>
+                <input type="url" id="pimg" placeholder="https://images.unsplash.com/...">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="pdesc" rows="3" placeholder="Brief product description..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button type="button" class="btn-secondary" style="flex:1" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn-primary" style="flex:1">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../assets/js/script.js"></script>
+<script>
+    // Admin check
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.role !== 'admin') { alert('Access Denied'); window.location.href = '../index.html'; }
+
+    let products = [];
+
+    async function loadProducts() {
+        try {
+            const res = await fetch('/api/products');
+            products = await res.json();
+            renderTable();
+        } catch (e) { console.error(e); }
+    }
+
+    function renderTable() {
+        const body = document.getElementById('productBody');
+        body.innerHTML = products.map(p => `
+            <tr>
+                <td><img src="${p.image}" class="product-thumb" alt=""></td>
+                <td><strong>${p.name}</strong></td>
+                <td><span class="badge" style="background:var(--bg-input)">${p.category}</span></td>
+                <td style="color:var(--primary); font-weight:700">$${p.price}</td>
+                <td>
+                    <button class="btn-sm" onclick="editProduct(${p.id})">Edit</button>
+                    <button class="btn-sm" style="background:#ef4444; border:none; margin-left:5px;" onclick="deleteProduct(${p.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openModal(id = null) {
+        document.getElementById('productForm').reset();
+        document.getElementById('pid').value = id || '';
+        document.getElementById('modalTitle').innerText = id ? 'Edit Product' : 'Add New Product';
+        
+        if (id) {
+            const p = products.find(prod => prod.id == id);
+            if (p) {
+                document.getElementById('pname').value = p.name;
+                document.getElementById('pcat').value = p.category;
+                document.getElementById('pprice').value = p.price;
+                document.getElementById('pimg').value = p.image;
+                document.getElementById('pdesc').value = p.description;
+            }
+        }
+        document.getElementById('productModal').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('productModal').classList.remove('open'); }
+
+    async function saveProduct(e) {
+        e.preventDefault();
+        const id = document.getElementById('pid').value;
+        const payload = {
+            name: document.getElementById('pname').value,
+            category: document.getElementById('pcat').value,
+            price: document.getElementById('pprice').value,
+            image: document.getElementById('pimg').value,
+            description: document.getElementById('pdesc').value
+        };
+
+        try {
+            const method = id ? 'PATCH' : 'POST';
+            const url = id ? `/api/products/${id}` : '/api/products';
+            const res = await apiRequest(url, {
+                method,
+                body: JSON.stringify(payload)
+            });
+            if (res.success) {
+                toasty(res.message);
+                closeModal();
+                loadProducts();
+            }
+        } catch (err) { toasty(err.message, 'error'); }
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm('Delete this product?')) return;
+        try {
+            const res = await apiRequest(`/api/products/${id}`, { method: 'DELETE' });
+            if (res.success) { toasty('Product deleted'); loadProducts(); }
+        } catch (err) { toasty(err.message, 'error'); }
+    }
+
+    document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem('user'); window.location.href = '../index.html'; };
+    loadProducts();
+</script>
+</body>
+</html>

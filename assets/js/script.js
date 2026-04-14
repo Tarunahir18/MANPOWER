@@ -13,7 +13,7 @@ const createApiCandidates = () => {
     const host = hostname || 'localhost';
     const scheme = protocol === 'file:' ? 'http:' : protocol;
     const currentPort = port || (scheme === 'https:' ? '443' : '80');
-    const ports = ['3000', '8080', '5000', '5500'];
+    const ports = ['3000', '3001', '3002', '5000', '5001', '8000', '8080', '5500', '5501'];
     const candidates = [];
 
     if (protocol !== 'file:') {
@@ -31,7 +31,17 @@ async function detectApiUrl() {
 
     for (const base of createApiCandidates()) {
         try {
-            const response = await fetch(`${base}/health`, { method: 'GET' });
+            // Add a timeout to the fetch call
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+            const response = await fetch(`${base}/health`, { 
+                method: 'GET',
+                signal: controller.signal 
+            });
+            
+            clearTimeout(timeoutId);
+
             if (response.ok) {
                 window.__API_URL__ = base;
                 console.log('[API_URL]', base);
@@ -404,11 +414,17 @@ async function handleAuth() {
             }
         }
 
-        // DIRECT DATABASE FALLBACK
-        const _dbClient = window.supabase ? window.supabase.createClient('https://merpbfceascuopcgqwiw.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro') : null;
+        // DIRECT DATABASE FALLBACK (Only if script.js has access to window.supabase)
+        const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+        
+        let _dbClient = null;
+        if (window.supabase) {
+            _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
         
         if (!_dbClient) {
-            msg.innerText = "Cannot connect to the server or database. Please run the backend.";
+            msg.innerText = "Connection failed. Please ensure the backend server is running.";
             return;
         }
 

@@ -583,6 +583,59 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
+app.post('/api/products', requireAdmin, async (req, res) => {
+    const { name, category, price, image, description } = req.body;
+    if (!name || !category || !price) {
+        return res.status(400).json({ success: false, message: 'Name, category and price are required' });
+    }
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .insert([{ name, category, price: Number(price), image, description }])
+            .select()
+            .single();
+        if (error) throw error;
+        res.json({ success: true, message: 'Product added', product: data });
+    } catch (error) {
+        console.error('[POST_PRODUCT]', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.patch('/api/products/:id', requireAdmin, async (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+    if (updates.price) updates.price = Number(updates.price);
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .update(updates)
+            .eq('id', id)
+            .select()
+            .single();
+        if (error) throw error;
+        res.json({ success: true, message: 'Product updated', product: data });
+    } catch (error) {
+        console.error('[PATCH_PRODUCT]', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.delete('/api/products/:id', requireAdmin, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { error } = await supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        res.json({ success: true, message: 'Product deleted' });
+    } catch (error) {
+        console.error('[DELETE_PRODUCT]', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 app.post('/api/create-order', (req, res) => {
     const { amount, currency } = req.body;
     const mockOrder = {

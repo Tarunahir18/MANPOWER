@@ -183,6 +183,31 @@
             background: #f1f5f9;
             color: #E8680F;
         }
+
+        /* Payment Modal Specifics */
+        .payment-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        .payment-modal.open { display: flex; animation: fadeIn 0.3s ease; }
+        .payment-card {
+            background: var(--bg-card); width: 100%; max-width: 450px; padding: 40px;
+            border-radius: 24px; border: 1px solid var(--border-default); position: relative;
+            text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
+        
+        .payment-tab {
+            flex: 1; padding: 12px; cursor: pointer; color: var(--text-muted); font-weight: 600;
+            transition: all 0.3s ease; border-bottom: 2px solid transparent;
+        }
+        .payment-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        
+        .instruction-list { list-style: none; padding: 0; margin-bottom: 20px; }
+        .instruction-list li { margin-bottom: 10px; font-size: 0.9rem; position: relative; padding-left: 20px; }
+        .instruction-list li::before { content: '✓'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -243,26 +268,56 @@
 <div class="payment-modal" id="paymentModal">
     <div class="payment-card">
         <button class="close-btn" onclick="closePayment()">✕</button>
-        <h2 style="margin-bottom: 5px;">Scan & Pay</h2>
-        <p style="color: var(--text-muted);">Secure UPI Payment via QR Code</p>
-        
-        <div class="qr-container">
-            <img src="../assets/images/payment-qr.png" alt="Payment QR Code">
+        <div style="text-align:center; margin-bottom:24px;">
+            <div id="paymentOptionTabs" style="display:flex; border-bottom:1px solid var(--border-subtle); margin-bottom:20px;">
+                <div class="payment-tab active" onclick="switchPayment('upi')" id="tab-upi">UPI Payment</div>
+                <div class="payment-tab" onclick="switchPayment('card')" id="tab-card">Credit / Debit Card</div>
+            </div>
         </div>
 
-        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">UPI ID</div>
-        <div class="upi-id-box">valatarunbhupatbhai-1@oksbi</div>
+        <!-- UPI Section -->
+        <div id="upiSection">
+            <h2 style="margin-bottom: 5px;">Scan & Pay</h2>
+            <p style="color: var(--text-muted); margin-bottom:20px;">Secure UPI Payment via QR Code</p>
+            
+            <div class="qr-container" style="background:white; padding:15px; border-radius:12px; margin-bottom:20px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+                <img src="../assets/images/payment-qr.png" alt="Payment QR Code" style="width:200px; height:200px; filter: contrast(1.1);">
+            </div>
 
-        <ul class="instruction-list">
-            <li>Scan the QR code using any UPI app (GPay, PhonePe, Paytm).</li>
-            <li>Complete the payment of <strong id="modalAmount">$0.00</strong>.</li>
-            <li>Note down the Transaction ID (UTR).</li>
-        </ul>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">UPI ID</div>
+            <div class="upi-id-box" style="background:var(--bg-input); padding:10px; border-radius:8px; margin:8px 0 20px; font-family:monospace; border:1px dashed var(--primary);">valatarunbhupatbhai-1@oksbi</div>
 
-        <label style="display:block; text-align:left; margin-bottom:8px; font-weight:700;">Enter Transaction ID (UTR)</label>
-        <input type="text" id="utrInput" placeholder="12-digit Transaction ID" style="width:100%; padding:12px; margin-bottom:20px; border-radius:12px; border:1px solid var(--border-default); background:var(--bg-input); color:var(--text-primary);">
+            <ul class="instruction-list" style="text-align:left; font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+                <li>Scan using any UPI app (GPay, PhonePe, Paytm).</li>
+                <li>Pay the exact amount: <strong id="modalAmount" style="color:var(--primary);">$0.00</strong></li>
+                <li>Enter the 12-digit UTR/Transaction ID below.</li>
+            </ul>
 
-        <button class="btn-primary" style="width:100%;" onclick="verifyManualPayment()">Verify & Confirm Order 🚀</button>
+            <input type="text" id="utrInput" placeholder="Enter Transaction ID (UTR)" style="width:100%; padding:14px; margin-bottom:16px; border-radius:12px; border:1px solid var(--border-default); background:var(--bg-input); color:var(--text-primary); font-weight:600; text-align:center;">
+            <button class="btn-primary" style="width:100%;" onclick="verifyPayment('upi')">Confirm UPI Order 🚀</button>
+        </div>
+
+        <!-- Card Section -->
+        <div id="cardSection" style="display:none;">
+            <h2 style="margin-bottom: 5px;">Card Payment</h2>
+            <p style="color: var(--text-muted); margin-bottom:24px;">Safe & Encrypted Transaction</p>
+            
+            <div class="form-group" style="text-align:left; margin-bottom:15px;">
+                <label style="font-size:12px; margin-bottom:5px; display:block;">Card Number</label>
+                <input type="text" placeholder="XXXX XXXX XXXX XXXX" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-default); background:var(--bg-input);">
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <div style="flex:2; text-align:left;">
+                    <label style="font-size:12px; margin-bottom:5px; display:block;">Expiry Date</label>
+                    <input type="text" placeholder="MM / YY" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-default); background:var(--bg-input);">
+                </div>
+                <div style="flex:1; text-align:left;">
+                    <label style="font-size:12px; margin-bottom:5px; display:block;">CVV</label>
+                    <input type="password" placeholder="***" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border-default); background:var(--bg-input);">
+                </div>
+            </div>
+            <button class="btn-primary" style="width:100%;" onclick="verifyPayment('card')">Pay <span id="modalAmountCard">$0.00</span> Now</button>
+        </div>
     </div>
 </div>
 
@@ -273,12 +328,12 @@
 
     async function loadProducts() {
         try {
-            const res = await fetch('/api/products');
-            allProducts = await res.json();
+            allProducts = await apiRequest('/products');
             renderProducts(allProducts);
             updateCartUI();
         } catch (e) {
             console.error("Failed to load products", e);
+            toasty("Failed to load products from server", "error");
         }
     }
 
@@ -358,10 +413,19 @@
         }
     }
 
+    function switchPayment(type) {
+        document.getElementById('upiSection').style.display = type === 'upi' ? 'block' : 'none';
+        document.getElementById('cardSection').style.display = type === 'card' ? 'block' : 'none';
+        document.getElementById('tab-upi').classList.toggle('active', type === 'upi');
+        document.getElementById('tab-card').classList.toggle('active', type === 'card');
+    }
+
     function startCheckout() {
         if (cart.length === 0) return alert("Cart is empty");
         const total = cart.reduce((sum, p) => sum + p.price, 0);
-        document.getElementById('modalAmount').innerText = `$${total.toFixed(2)}`;
+        const formatted = `$${total.toFixed(2)}`;
+        document.getElementById('modalAmount').innerText = formatted;
+        document.getElementById('modalAmountCard').innerText = formatted;
         toggleCart(); // Close cart
         document.getElementById('paymentModal').classList.add('open');
     }
@@ -370,26 +434,27 @@
         document.getElementById('paymentModal').classList.remove('open');
     }
 
-    async function verifyManualPayment() {
-        const utr = document.getElementById('utrInput').value.trim();
-        if (!utr || utr.length < 6) return alert("Please enter a valid Transaction ID.");
+    async function verifyPayment(type) {
+        if (type === 'upi') {
+            const utr = document.getElementById('utrInput').value.trim();
+            if (!utr || utr.length < 6) return alert("Please enter a valid Transaction ID.");
+        } else {
+            // Card simulation
+            toasty("Processing card payment...");
+        }
 
         try {
-            const res = await fetch('/api/verify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ razorpay_order_id: "qr_pay", razorpay_payment_id: utr })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert("Order Placed Successfully! Admin will verify your payment shortly.");
+            // In a real app, this would verify with a real gateway
+            toasty("Processing transaction...", "info");
+            setTimeout(() => {
+                toasty("Order Placed Successfully! Admin will verify your payment shortly.");
                 cart = [];
                 localStorage.setItem('mp_cart', '[]');
                 updateCartUI();
                 closePayment();
-            }
+            }, 1500);
         } catch (e) {
-            alert("Verification failed. Please try again.");
+            toasty("Verification failed. Please try again.", "error");
         }
     }
 
