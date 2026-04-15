@@ -135,8 +135,41 @@
                 btn.disabled = false;
             }
         } catch(e) {
-            console.error(e);
-            localToast("Server Error: " + e.message, true);
+            console.warn("API unavailable, running direct DB enrollment fallback...");
+            const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+            
+            if (window.supabase) {
+                try {
+                    const _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    let userStr = localStorage.getItem('user');
+                    let user = JSON.parse(userStr);
+                    
+                    const { error } = await _dbClient.from('enrollments').insert([{
+                        user_email: user.email,
+                        game_name: gameName
+                    }]);
+                    
+                    if (!error || (error.code === '23505')) { // Success or already enrolled
+                        localToast(`Successfully enrolled in ${gameName} (Offline Sync)!`);
+                        btn.innerText = "ALREADY ENROLLED ✓";
+                        btn.style.background = "var(--bg-card)";
+                        btn.style.color = "var(--primary)";
+                        btn.style.border = "1px solid var(--primary-border)";
+                        
+                        user.enrolled = user.enrolled || [];
+                        if(!user.enrolled.includes(gameName)) {
+                            user.enrolled.push(gameName);
+                            localStorage.setItem('user', JSON.stringify(user));
+                        }
+                        return;
+                    }
+                } catch(dbErr) {
+                    // fall through
+                }
+            }
+            
+            localToast("System offline. Could not enroll.", true);
             btn.innerText = "Confirm Enrollment →";
             btn.disabled = false;
             btn.style.opacity = "1";

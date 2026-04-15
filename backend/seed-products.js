@@ -71,6 +71,27 @@ const products = [
         price: 28.50,
         image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=800&auto=format&fit=crop',
         description: 'Double-wall vacuum insulated stainless steel water bottle. Keeps drinks cold for 24 hours.'
+    },
+    {
+        name: 'Pro Carbon Archery Bow',
+        category: 'Equipment',
+        price: 199.99,
+        image: 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?q=80&w=800&auto=format&fit=crop',
+        description: 'Professional grade carbon fiber recurve bow. Extremely lightweight with high accuracy design for competitive archery.'
+    },
+    {
+        name: 'Precision Target Arrows (Set of 6)',
+        category: 'Accessories',
+        price: 45.00,
+        image: 'https://images.unsplash.com/photo-1582645607914-7221b2dd736b?q=80&w=800&auto=format&fit=crop',
+        description: 'Set of 6 high-durability carbon arrows featuring aerodynamic vanes and precision stainless steel field points.'
+    },
+    {
+        name: 'Elite Archery Target Board',
+        category: 'Equipment',
+        price: 85.50,
+        image: 'https://images.unsplash.com/photo-1533221974955-46f90d540f2f?q=80&w=800&auto=format&fit=crop',
+        description: 'Self-healing dense foam target board constructed for extreme durability and easy arrow retrieval.'
     }
 ];
 

@@ -115,8 +115,8 @@ const apiRequest = async (path, options = {}) => {
         });
         clearTimeout(timeoutId);
     } catch (fetchError) {
-        console.error(`[API] Fetch Error for ${url}:`, fetchError);
-        const error = new Error(fetchError.name === 'AbortError' ? 'Server connection timed out' : (fetchError.message || 'Network request failed'));
+        console.warn(`[API] Connection to ${url} unavailable. Triggering fallback.`);
+        const error = new Error('Backend unavailable');
         error.isNetworkError = true;
         throw error;
     }
@@ -568,8 +568,9 @@ async function showHome() {
 
     console.log("[HOME] User detected:", user);
 
+    const welcomeText = document.getElementById("welcomeText");
     if (welcomeText) {
-        welcomeText.innerText = `Hello, ${user.email.split("@")[0]}!`;
+        welcomeText.innerText = user.role === "admin" ? "Welcome, Admin" : `Hello, ${user.email.split("@")[0]}!`;
     }
 
     // Show/Hide role-based navigation
@@ -642,7 +643,48 @@ const loadUsers = async () => {
             userTableBody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--danger)'>Error loading user data!</td></tr>";
         }
     } catch (error) {
-        console.error('[ADMIN] Load users failed', error);
+        console.warn('[ADMIN] API unavailable, trying direct DB fallback for users...');
+        const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+        
+        if (window.supabase) {
+            try {
+                const _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                const { data: usersData, error: dbError } = await _dbClient.from('users').select('*');
+                const { data: enrollmentsData } = await _dbClient.from('enrollments').select('*');
+
+                if (!dbError && usersData) {
+                    if (usersData.length === 0) {
+                        userTableBody.innerHTML = "<tr><td colspan='5' style='text-align:center'>No registered users.</td></tr>";
+                        return;
+                    }
+                    
+                    userTableBody.innerHTML = usersData.map(u => {
+                        const pass = u.password || u;
+                        const role = u.role || "user";
+                        const userEnrollments = (enrollmentsData || []).filter(e => e.user_email === u.email).map(e => e.game_name);
+                        return `
+                        <tr>
+                            <td>${u.email}</td>
+                            <td>${pass}</td>
+                            <td><span class="status-badge ${role === "admin" ? "admin-badge" : role === "coach" ? "coach-badge" : "user-badge"}">${role}</span></td>
+                            <td>${userEnrollments.length > 0 ? userEnrollments.join(', ') : 'None'}</td>
+                            <td>
+                                <button class="action-btn edit-btn" onclick="changeUserRole('${u.email}', 'user')">User</button>
+                                <button class="action-btn edit-btn" onclick="changeUserRole('${u.email}', 'coach')">Coach</button>
+                                <button class="action-btn edit-btn" onclick="changeUserRole('${u.email}', 'admin')">Admin</button>
+                                <button class="action-btn delete-btn" onclick="deleteUser('${u.email}')">Delete</button>
+                            </td>
+                        </tr>
+                        `;
+                    }).join("");
+                    return;
+                }
+            } catch (e) {
+                // fall through
+            }
+        }
+        
         userTableBody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--danger)'>Error loading user data.</td></tr>";
     }
 };
@@ -690,7 +732,29 @@ const loadAdminStats = async () => {
             }
         }
     } catch (error) {
-        console.error('[STATS] Error:', error);
+        console.warn('[STATS] API unavailable, syncing direct DB fallback for admin stats...');
+        const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+        
+        if (window.supabase) {
+            try {
+                const _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                const { count: usersCount } = await _dbClient.from('users').select('*', { count: 'exact', head: true });
+                const { count: enrollCount } = await _dbClient.from('enrollments').select('*', { count: 'exact', head: true });
+                const { data: enrollments } = await _dbClient.from('enrollments').select('user_email');
+                const { count: contactsCount } = await _dbClient.from('contacts').select('*', { count: 'exact', head: true });
+                
+                const activeUsers = new Set((enrollments || []).map(e => e.user_email)).size;
+                
+                if (totalUsersCard) totalUsersCard.innerText = usersCount || 0;
+                if (enrollmentsCard) enrollmentsCard.innerText = enrollCount || 0;
+                if (activeUsersCard) activeUsersCard.innerText = activeUsers || 0;
+                if (pendingMessagesCard) pendingMessagesCard.innerText = contactsCount || 0;
+                return;
+            } catch (e) {
+                // fall through
+            }
+        }
     }
 };
 
@@ -740,8 +804,35 @@ window.enroll = async (gameName) => {
             toasty(data.message || "Enrollment failed.", 'error');
         }
     } catch (error) {
-        console.error('[ENROLL] Error:', error);
-        toasty(error.message || "Error enrolling. Try again.", 'error');
+        console.warn('[ENROLL] API unavailable, running direct DB enrollment fallback...');
+        const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+        
+        if (window.supabase) {
+            try {
+                const _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                const { error: dbErr } = await _dbClient.from('enrollments').insert([{
+                    user_email: user.email,
+                    game_name: gameName
+                }]);
+                
+                if (!dbErr || dbErr.code === '23505') {
+                    toasty(`Enrolled in ${gameName} (Offline Sync)!`);
+                    user.enrolled = user.enrolled || [];
+                    if (!user.enrolled.includes(gameName)) {
+                        user.enrolled.push(gameName);
+                        user.activities = user.activities || [];
+                        user.activities.push({ action: 'enrolled', game: gameName, timestamp: new Date().toISOString() });
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+                    addNotification(`${user.email} enrolled in ${gameName}`);
+                    return;
+                }
+            } catch (e) {
+                // fall through
+            }
+        }
+        toasty("System offline. Could not enroll.", 'error');
     }
 };
 
@@ -798,6 +889,36 @@ window.loadTournaments = async () => {
             `).join('');
         }
     } catch (e) {
+        console.warn("API unavailable, trying direct DB fallback for tournaments...");
+        const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+        if (window.supabase) {
+            const _dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { data: fallbackTournaments, error: dbError } = await _dbClient.from('tournaments').select('*').order('created_at', { ascending: true });
+            
+            if (!dbError && fallbackTournaments) {
+                if (fallbackTournaments.length === 0) {
+                    list.innerHTML = '<p style="color:var(--text-muted);">No tournaments launched yet. Check back later!</p>';
+                    return;
+                }
+                list.innerHTML = [...fallbackTournaments].reverse().map(t => `
+                    <div class="tournament-card">
+                        <div class="tournament-img">
+                           <img src="${t.image}" alt="${t.venue}">
+                           <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(9,20,37,0.9) 0%, rgba(9,20,37,0) 70%);"></div>
+                           <span class="badge badge-success" style="position: absolute; bottom: 12px; left: 12px;">${t.sport}</span>
+                        </div>
+                        <div class="tournament-body">
+                            <h4>${t.name}</h4>
+                            <p>📍 Venue: ${t.venue}</p>
+                            <button onclick="window.location.href='sport.html?game=' + encodeURIComponent('${t.name}')" class="btn-primary" style="width: 100%; font-size: 12px;">Enroll to Tournament →</button>
+                        </div>
+                    </div>
+                `).join('');
+                return;
+            }
+        }
+        
         list.innerHTML = '<p style="color:var(--danger);">Error loading tournaments.</p>';
     }
 };

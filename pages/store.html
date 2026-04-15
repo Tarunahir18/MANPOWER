@@ -393,11 +393,11 @@
             renderProducts(allProducts);
             updateCartUI();
         } catch (e) {
-            console.error("API failed, trying direct DB fallback...", e);
+            console.warn("API unavailable, syncing directly to Supabase fallback...");
             
             // Fallback to Supabase directly
             const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
-            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
             
             if (window.supabase) {
                 const _db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
