@@ -317,12 +317,9 @@ const loginTitle = document.getElementById("loginTitle");
 const modeNote = document.getElementById("modeNote");
 const logoutBtn = document.getElementById("logoutBtn");
 
-function showHome() {
-    if (loader) loader.style.display = "none";
-    if (loginPage) loginPage.style.display = "none";
-    if (homePage) homePage.style.display = "block";
-    updateWelcomeText();
-}
+// showHome is defined below as an async function (full implementation)
+// This placeholder ensures backward compatibility with any early calls
+var _showHomeEarlyCall = false;
 
 function showLogin() {
     if (loader) loader.style.display = "none";
@@ -363,7 +360,7 @@ function updateLoginUi() {
         emailInput.placeholder = "Admin Username";
         submitBtn.innerText = "Login";
     }
-    msg.innerText = "";
+    if (msg) msg.innerText = "";
 
     // Toggle Google Sign-In button visibility (only for student mode)
     const googleBtn = document.getElementById('googleSignInBtn');

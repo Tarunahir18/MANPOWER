@@ -125,6 +125,9 @@
 
     let products = [];
 
+    // Alias for table row button calls
+    function editProduct(id) { openModal(id); }
+
     async function loadProducts() {
         try {
             products = await apiRequest('/products');

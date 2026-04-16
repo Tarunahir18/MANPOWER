@@ -121,11 +121,11 @@
             if (data.success && data.contacts && data.contacts.length > 0) {
                 table.innerHTML = data.contacts.slice(-10).reverse().map(msg => `
                     <tr>
-                        <td>${msg.timestamp ? new Date(msg.timestamp).toLocaleDateString() : 'N/A'}</td>
+                        <td>${msg.created_at ? new Date(msg.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td><strong>${msg.name || 'N/A'}</strong></td>
                         <td>${msg.email || 'N/A'}</td>
                         <td>${msg.subject || 'N/A'}</td>
-                        <td style="color:var(--text-muted);">${(msg.message || '').substring(0, 50)}...</td>
+                        <td style="color:var(--text-muted);">${(msg.message || '').substring(0, 50)}${msg.message && msg.message.length > 50 ? '...' : ''}</td>
                     </tr>
                 `).join('');
             } else {
