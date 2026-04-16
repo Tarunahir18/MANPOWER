@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Management – MANPOWER Admin</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
@@ -128,30 +129,74 @@
     // Alias for table row button calls
     function editProduct(id) { openModal(id); }
 
+    const SUPABASE_URL = 'https://merpbfceascuopcgqwiw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBiZmNlYXNjdW9wY2dxd2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNjA2ODcsImV4cCI6MjA5MTczNjY4N30.r-0Pz6l7N7N7S4wrpHpxCCv5JBSKhDgDmq3tl0Sq8ro';
+
+    function generateTextLogo(name, category) {
+        const colors = {
+            'Jerseys': ['#E8680F', '#091425'],
+            'Equipment': ['#00897B', '#091425'],
+            'Supplements': ['#1E88E5', '#091425'],
+            'Other': ['#64748b', '#091425']
+        };
+        const [primary, bg] = colors[category] || colors['Other'];
+        const svg = `
+        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="${bg}"/>
+            <text x="50%" y="55%" text-anchor="middle" fill="white" font-family="sans-serif" font-weight="bold" font-size="14">${name.substring(0,2).toUpperCase()}</text>
+        </svg>`;
+        return `data:image/svg+xml;base64,${btoa(svg)}`;
+    }
+
     async function loadProducts() {
+        const body = document.getElementById('productBody');
+        if (body) body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">⏳ Loading products...</td></tr>';
+
         try {
-            products = await apiRequest('/products');
+            const res = await apiRequest('/products');
+            products = Array.isArray(res) ? res : (res.products || []);
             renderTable();
         } catch (e) { 
-            console.error(e);
+            console.warn('[ADMIN STORE] API failed, trying Supabase...', e);
+            if (window.supabase) {
+                try {
+                    const _db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    const { data, error } = await _db.from('products').select('*').order('id', { ascending: true });
+                    if (!error && data) {
+                        products = data;
+                        renderTable();
+                        return;
+                    }
+                } catch (err) { console.error('[SUPABASE ERROR]', err); }
+            }
+            if (body) body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--danger);">❌ Failed to load products. Page is offline and database is unreachable.</td></tr>';
             toasty("Failed to load products", "error");
         }
     }
 
     function renderTable() {
         const body = document.getElementById('productBody');
-        body.innerHTML = products.map(p => `
+        if (!body) return;
+        
+        if (!products || products.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">No products found in store.</td></tr>';
+            return;
+        }
+
+        body.innerHTML = products.map(p => {
+            const imgSrc = (p.image && p.image !== 'text') ? p.image : generateTextLogo(p.name, p.category);
+            return `
             <tr>
-                <td><img src="${p.image}" class="product-thumb" alt=""></td>
+                <td><img src="${imgSrc}" class="product-thumb" alt="${p.name}" onerror="this.src=generateTextLogo('${p.name}', '${p.category}')"></td>
                 <td><strong>${p.name}</strong></td>
-                <td><span class="badge" style="background:var(--bg-input)">${p.category}</span></td>
+                <td><span class="badge" style="background:var(--bg-input); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;">${p.category}</span></td>
                 <td style="color:var(--primary); font-weight:700">$${p.price}</td>
                 <td>
                     <button class="btn-sm" onclick="editProduct(${p.id})">Edit</button>
-                    <button class="btn-sm" style="background:#ef4444; border:none; margin-left:5px;" onclick="deleteProduct(${p.id})">Delete</button>
+                    <button class="btn-sm" style="background:#ef4444; border:none; margin-left:5px; color:white;" onclick="deleteProduct(${p.id})">Delete</button>
                 </td>
             </tr>
-        `).join('');
+        `; }).join('');
     }
 
     function openModal(id = null) {
@@ -197,7 +242,26 @@
                 closeModal();
                 loadProducts();
             }
-        } catch (err) { toasty(err.message, 'error'); }
+        } catch (err) { 
+            if (window.supabase) {
+                try {
+                    const _db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    let res;
+                    if (id) {
+                        res = await _db.from('products').update(payload).eq('id', id);
+                    } else {
+                        res = await _db.from('products').insert([payload]);
+                    }
+                    if (!res.error) {
+                        toasty(id ? "Product updated (Offline Sync)" : "Product added (Offline Sync)");
+                        closeModal();
+                        loadProducts();
+                        return;
+                    }
+                } catch(dbErr) {}
+            }
+            toasty(err.message, 'error'); 
+        }
     }
 
     async function deleteProduct(id) {
@@ -205,7 +269,20 @@
         try {
             const res = await apiRequest(`/products/${id}`, { method: 'DELETE' });
             if (res.success) { toasty('Product deleted'); loadProducts(); }
-        } catch (err) { toasty(err.message, 'error'); }
+        } catch (err) { 
+            if (window.supabase) {
+                try {
+                    const _db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    const { error } = await _db.from('products').delete().eq('id', id);
+                    if (!error) {
+                        toasty('Product deleted (Offline Sync)');
+                        loadProducts();
+                        return;
+                    }
+                } catch(dbErr) {}
+            }
+            toasty(err.message, 'error'); 
+        }
     }
 
     document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem('user'); window.location.href = '../index.html'; };
